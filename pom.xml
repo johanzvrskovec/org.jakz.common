@@ -21,8 +21,8 @@
   		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20150729</version>
-		</dependency>
+			<version>20160212</version>
+  		</dependency>
 		<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
@@ -46,7 +46,7 @@
 	    <dependency>
 	    	<groupId>com.h2database</groupId>
 	    	<artifactId>h2</artifactId>
-	    	<version>1.4.190</version>
+	    	<version>1.4.192</version>
 	    </dependency>
 	    <dependency>
 	    	<groupId>org.apache.commons</groupId>
@@ -64,7 +64,7 @@
 	  		<version>2.4.1</version>
 	  	</dependency>
   </dependencies>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <organization>
   	<name>jakz</name>
   </organization>

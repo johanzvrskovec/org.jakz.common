@@ -591,17 +591,17 @@ public class DataCache
 	private void rebuildCommonArchitecture() throws ApplicationException, SQLException
 	{
 		PreparedStatement s;
-		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS stringSeparateFixedSpacingRight FOR \"org.ki.meb.common.Utils.stringSeparateFixedSpacingRight\"");
+		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS stringSeparateFixedSpacingRight FOR \"org.jakz.common.Util.stringSeparateFixedSpacingRight\"");
 		s.execute();
-		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS stringSeparateFixedSpacingLeft FOR \"org.ki.meb.common.Utils.stringSeparateFixedSpacingLeft\"");
+		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS stringSeparateFixedSpacingLeft FOR \"org.jakz.common.Util.stringSeparateFixedSpacingLeft\"");
 		s.execute();
-		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MAX_DOUBLE FOR \"org.ki.meb.common.Utils.numMaxDouble\"");
+		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MAX_DOUBLE FOR \"org.jakz.common.Util.numMaxDouble\"");
 		s.execute();
-		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MIN_DOUBLE FOR \"org.ki.meb.common.Utils.numMinDouble\"");
+		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MIN_DOUBLE FOR \"org.jakz.common.Util.numMinDouble\"");
 		s.execute();
-		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MAX_INTEGER FOR \"org.ki.meb.common.Utils.numMaxInteger\"");
+		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MAX_INTEGER FOR \"org.jakz.common.Util.numMaxInteger\"");
 		s.execute();
-		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MIN_INTEGER FOR \"org.ki.meb.common.Utils.numMinInteger\"");
+		s=con.prepareStatement("CREATE ALIAS IF NOT EXISTS NUM_MIN_INTEGER FOR \"org.jakz.common.Util.numMinInteger\"");
 		s.execute();
 	}
 	

@@ -807,13 +807,15 @@ public class CustomFormatter
 			}
 		}
 		
-		XSSFCellStyle style_link;
+		XSSFCellStyle style_link, style_fp_numeric;
 		//System.out.println("num cell styles>"+currentWorkbook.getNumCellStyles());
 		if(excelStyle.containsKey("style_link"))
 		{
 			int stylei = excelStyle.get("style_link").index;
 			//System.out.println("Using existing style at index "+stylei);
 			style_link=currentWorkbook.getCellStyleAt(stylei);
+			stylei = excelStyle.get("style_fp_numeric").index;
+			style_fp_numeric=currentWorkbook.getCellStyleAt(stylei);
 		}
 		else
 		{
@@ -834,6 +836,10 @@ public class CustomFormatter
 		    //StylesTable stylesSource = currentWorkbook.getStylesSource();
 		    //System.out.println("Putting link style at index "+excelStyle.size());
 		    excelStyle.put("style_link",style_link);
+		
+		    //TODO
+			style_fp_numeric = currentWorkbook.createCellStyle();
+		    excelStyle.put("style_fp_numeric",style_fp_numeric);
 		}
 
 			
