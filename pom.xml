@@ -4,6 +4,9 @@
   <artifactId>org.jakz.common</artifactId>
   <name>org.jakz.common</name>
   <description>org.jakz.common</description>
+  <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
