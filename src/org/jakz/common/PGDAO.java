@@ -1,50 +1,35 @@
 package org.jakz.common;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-
-
-public class PGDAO 
+public class PGDAO extends DAO
 {
-	protected final DateTimeFormatter formatPGDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-	protected Connection c;
+	
+	public PGDAO(String target, String username, String password, boolean autoCommit) throws ClassNotFoundException, SQLException
+	{
+		Class.forName("org.postgresql.Driver");
+		connect(target,username,password,autoCommit);
+	}
 	
 	public PGDAO(String target, String username, String password) throws ClassNotFoundException, SQLException
 	{
-		c=null;
 		Class.forName("org.postgresql.Driver");
-		connect(target,username,password);
+		connect(target,username,password,false);
 	}
-	
-	public void connect(String target, String username, String password) throws SQLException
-	{
-		c = DriverManager.getConnection(target, username, password);
-		c.setAutoCommit(false);
-	}
-	
-	
-	
-	public void begin() throws SQLException
+
+	@Override
+	public void startTransaction() throws SQLException 
 	{
 		Statement q = c.createStatement();
 		q.execute("START TRANSACTION;");
 		q.close();
 	}
 	
-	public void startTransaction() throws SQLException
-	{
-		begin();
-	}
-	
+	@Override
 	public void commit() throws SQLException
 	{
-		if(c.getAutoCommit())
+		if(!c.getAutoCommit())
 			c.commit();
 		else
 		{
@@ -54,9 +39,10 @@ public class PGDAO
 		}
 	}
 	
+	@Override
 	public void rollback() throws SQLException
 	{
-		if(c.getAutoCommit())
+		if(!c.getAutoCommit())
 			c.rollback();
 		else
 		{
@@ -66,8 +52,4 @@ public class PGDAO
 		}
 	}
 	
-	public Connection getConnection()
-	{
-		return c;
-	}
 }
