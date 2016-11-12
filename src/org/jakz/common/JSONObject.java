@@ -290,10 +290,17 @@ public class JSONObject extends org.json.JSONObject implements Serializable
         this.populateMap(bean.theBean);
     }
     
-    public JSONObject(Object pojo) throws IllegalArgumentException, IllegalAccessException
+    public JSONObject(Object pojo) throws JSONException
 	{
     	this();
-		populateFromPOJO(pojo);
+    	
+		try 
+		{
+			populateFromPOJO(pojo);
+		} catch (Exception e) 
+		{
+			throw new JSONException(e);
+		}
 	}
     
     /**
