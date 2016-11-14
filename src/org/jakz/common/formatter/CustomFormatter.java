@@ -837,8 +837,8 @@ public class CustomFormatter
 		    //System.out.println("Putting link style at index "+excelStyle.size());
 		    excelStyle.put("style_link",style_link);
 		
-		    //TODO
 			style_fp_numeric = currentWorkbook.createCellStyle();
+			style_fp_numeric.setDataFormat(11); //scientific format
 		    excelStyle.put("style_fp_numeric",style_fp_numeric);
 		}
 
@@ -905,9 +905,11 @@ public class CustomFormatter
 							isHyperlink = templateValueMeta.has("isHyperlink")&&templateValueMeta.getBoolean("isHyperlink");
 						}
 						
+						
+						Cell c;
 						if(isExcelFormula)
 						{
-							Cell c = currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_FORMULA);
+							c = currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_FORMULA);
 							c.setCellFormula(readElement.getString("value"));
 							CellValue evalvalue = formulaEvaluator.evaluate(c);
 							//int evaltype = formulaEvaluator.evaluateFormulaCell(c);
@@ -941,12 +943,14 @@ public class CustomFormatter
 						}
 						else if(valueMeta.getInt("type")==java.sql.Types.TIMESTAMP)
 						{
-							Cell c = currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_BOOLEAN);
+							c = currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_BOOLEAN);
 							c.setCellValue(new Date(readElement.getLong("value")));
 						}
 						else if(valueMeta.getInt("type")==java.sql.Types.DOUBLE||valueMeta.getInt("type")==java.sql.Types.DECIMAL)
 						{
-							currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_NUMERIC).setCellValue(readElement.getDouble("value"));
+							c = currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_NUMERIC);
+							c.setCellValue(readElement.getDouble("value"));
+							c.setCellStyle(style_fp_numeric);
 						}
 						else if(valueMeta.getInt("type")==java.sql.Types.BIGINT||valueMeta.getInt("type")==java.sql.Types.INTEGER||valueMeta.getInt("type")==java.sql.Types.SMALLINT)
 						{
