@@ -958,15 +958,15 @@ public class CustomFormatter
 						}
 						else if(valueMeta.getInt("type")==java.sql.Types.VARCHAR)
 						{
-							Cell cc = currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_STRING);
+							c = currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_STRING);
 							//cc.setCellStyle(cellStyleTextWrap);
-							cc.setCellValue(readElement.getString("value"));
+							c.setCellValue(readElement.getString("value"));
 						}
 						else throw new ApplicationException("Wrong datatype for Excel conversion");
 					}
 					else
 					{
-						currentRow.createCell(iCell, Cell.CELL_TYPE_BLANK);
+						Cell c =currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_BLANK);
 					}
 				}
 			}
