@@ -45,7 +45,7 @@ import org.json.JSONObject;
 import org.jakz.common.ApplicationException;
 import org.jakz.common.DataCache;
 import org.jakz.common.IndexedMap;
-import org.jakz.common.DataCache.DataEntry;
+import org.jakz.common.DataEntry;
 import org.jakz.common.Util;
 
 
@@ -228,12 +228,12 @@ public class CustomFormatter
 			else
 				formatToUse=csvFormatCSVIMPROVED;
 			
-			writeCSV(formatToUse);
+			writeCSV(formatToUse,nEntry);
 			return this;
 		}
 		else if(outputType==IOType.DATACACHE)
 		{
-			writeDatacache();
+			writeDatacache(nEntry);
 			return this;
 		}
 		else throw new ApplicationException("Output write format ("+outputType+") is unsupported by the formatter");
@@ -763,6 +763,16 @@ public class CustomFormatter
 		dataCache.enter(entry);
 	}
 	
+	boolean skipColumnCheck(JSONObject valueMeta, JSONObject entryTemplate)
+	{
+		//condition for skipping column for various reasons
+		return
+				(settingOutputSkipEmptyColumns && valueMeta.has("empty") && valueMeta.getBoolean("empty")==true) //empty column together with skip empty column setting
+				||
+				(entryTemplate!=null && (entryTemplate.has("hide") && entryTemplate.getBoolean("hide")==true)) //column is marked with hide
+			;
+	}
+	
 	
 	private void writeExcel(boolean append, DataEntry entryTemplate) throws InvalidFormatException, IOException, ApplicationException, SQLException
 	{
@@ -871,9 +881,10 @@ public class CustomFormatter
 		for(int iCell=0; iCell<e.getNamemapSize(); iCell++)
 		{
 			JSONObject valueMeta = e.getNamemapMetaAt(iCell);
-			if(settingOutputSkipEmptyColumns && valueMeta.has("empty") && valueMeta.getBoolean("empty")==true)
-				continue;
 			String cellName = valueMeta.getString("name");
+			if(skipColumnCheck(valueMeta,entryTemplate.namemap.getValue(cellName)))
+				continue;
+			
 			currentRow.createCell(iCellNonSkipped++, Cell.CELL_TYPE_STRING).setCellValue(cellName);
 		}
 		
@@ -887,10 +898,10 @@ public class CustomFormatter
 				for(int iCell=0; iCell<e.getNamemapSize(); iCell++)
 				{
 					JSONObject valueMeta = e.getNamemapMetaAt(iCell);
-					
-					if(settingOutputSkipEmptyColumns && valueMeta.has("empty") && valueMeta.getBoolean("empty")==true)
-						continue;
 					String cellName = valueMeta.getString("name");
+					if(skipColumnCheck(valueMeta,entryTemplate.namemap.getValue(cellName)))
+						continue;
+					
 					JSONObject readElement = readRow.getJSONObject(cellName);
 					//Set<String> keys = readRow.keySet();
 					
@@ -989,7 +1000,7 @@ public class CustomFormatter
 	}
 	
 	
-	private void writeCSV(CSVFormat format) throws InvalidFormatException, IOException, ApplicationException, SQLException
+	private void writeCSV(CSVFormat format, DataEntry entryTemplate) throws InvalidFormatException, IOException, ApplicationException, SQLException
 	{
 		if(settingPath==null)
 			throw new ApplicationException("Dataset for reading not named");
@@ -1008,9 +1019,10 @@ public class CustomFormatter
 		for(int iCell=0; iCell<e.getNamemapSize(); iCell++)
 		{
 			JSONObject valueMeta = e.getNamemapMetaAt(iCell);
-			if(settingOutputSkipEmptyColumns && valueMeta.has("empty") && valueMeta.getBoolean("empty")==true)
-				continue;
 			String cellName = valueMeta.getString("name");
+			if(skipColumnCheck(valueMeta,entryTemplate.namemap.getValue(cellName)))
+				continue;
+			
 			currentRow.add(cellName);
 		}
 		printer.printRecord(currentRow);
@@ -1025,9 +1037,10 @@ public class CustomFormatter
 				for(int iCell=0; iCell<e.getNamemapSize(); iCell++)
 				{
 					JSONObject valueMeta = e.getNamemapMetaAt(iCell);
-					if(settingOutputSkipEmptyColumns && valueMeta.has("empty") && valueMeta.getBoolean("empty")==true)
-						continue;
 					String cellName = valueMeta.getString("name");
+					if(skipColumnCheck(valueMeta,entryTemplate.namemap.getValue(cellName)))
+						continue;
+					
 					JSONObject readElement = readRow.getJSONObject(cellName);
 					//Set<String> keys = readRow.keySet();
 					
@@ -1072,7 +1085,7 @@ public class CustomFormatter
 		printer.close();
 	}
 	
-	private void writeDatacache() throws InvalidFormatException, IOException, ApplicationException, SQLException
+	private void writeDatacache(DataEntry entryTemplate) throws InvalidFormatException, IOException, ApplicationException, SQLException
 	{
 		if(settingPath==null)
 			throw new ApplicationException("Dataset for reading not named");
