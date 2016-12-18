@@ -4,7 +4,7 @@ package org.jakz.common;
  * @author johkal
  *
  */
-public class TypedValue
+public class TypedValue implements JSONReader, JSONWriter
 {
 	/**
 	 * Convention: as java.sql.Types
@@ -108,5 +108,45 @@ public class TypedValue
 	public Long getValueTimestamp() {return valueLong;}
 	public Long getValueBigint() {return valueLong;}
 	public Double getValueDouble() {return valueDouble;}
+
+	@Override
+	public JSONObject toJSON() 
+	{
+		JSONObject toreturn = new JSONObject();
+		toreturn.put("type", type);
+		if(type==java.sql.Types.INTEGER)
+			toreturn.put("value", valueInteger);
+		else if(type==java.sql.Types.DOUBLE)
+			toreturn.put("value", valueDouble);
+		else if(type==java.sql.Types.BOOLEAN)
+			toreturn.put("value", valueInteger!=0);
+		else if(type==java.sql.Types.VARCHAR||type==java.sql.Types.NVARCHAR)
+			toreturn.put("value", valueString);
+		else if(type==java.sql.Types.TIMESTAMP)
+			toreturn.put("value", valueLong);
+		else if(type==java.sql.Types.BIGINT)
+			toreturn.put("value", valueLong);
+		
+		return toreturn;
+	}
+
+	@Override
+	public void fromJSON(JSONObject source) 
+	{
+		type=source.getInt("type");
+		if(type==java.sql.Types.INTEGER)
+			setInteger(source.getInt("value"));
+		else if(type==java.sql.Types.DOUBLE)
+			setDouble(source.getDouble("value"));
+		else if(type==java.sql.Types.BOOLEAN)
+			setBoolean(source.getBoolean("value"));
+		else if(type==java.sql.Types.VARCHAR||type==java.sql.Types.NVARCHAR)
+			setVarchar(source.getString("value"));
+		else if(type==java.sql.Types.TIMESTAMP)
+			setTimestamp(source.getLong("value"));
+		else if(type==java.sql.Types.BIGINT)
+			setBigint(source.getLong("value"));
+		
+	}
 	
 }
