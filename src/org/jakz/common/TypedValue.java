@@ -133,6 +133,7 @@ public class TypedValue implements JSONReader, JSONWriter
 	@Override
 	public void fromJSON(JSONObject source) 
 	{
+		init();
 		type=source.getInt("type");
 		if(type==java.sql.Types.INTEGER)
 			setInteger(source.getInt("value"));
