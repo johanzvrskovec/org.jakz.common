@@ -7,7 +7,7 @@ package org.jakz.common;
  * @author johkal
  *
  */
-public interface JSONReader 
+public interface JSONObjectWriteAspect 
 {
-	public void fromJSON(JSONObject source);
+	public JSONObject toJSONObject();
 }

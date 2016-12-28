@@ -2,17 +2,21 @@ package org.jakz.common;
 
 import java.util.ArrayList;
 
-public class Form implements JSONReader, JSONWriter
+import org.jakz.common.Form.FieldType;
+/**
+ * The Form is either a complete form or a nested element in a form.
+ * @author johan
+ *
+ */
+public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 {
-	public static enum FieldType {form,element};
+	public static enum FieldType {container,single,multi};
 	
 	public String id;
 	public FieldType type;
 	public ArrayList<TypedValue> value;
-	private Form parent;
-	private IndexedMap<String,Form> content;
-	
-	
+	protected Form parent;
+	protected IndexedMap<String,Form> content;
 	
 	private void init()
 	{
@@ -27,9 +31,14 @@ public class Form implements JSONReader, JSONWriter
 		id=nid;
 		type=ntype;	
 	}
+	
+	public String getGlobalID()
+	{
+		return parent.getGlobalID()+"."+id;
+	}
 
 	@Override
-	public JSONObject toJSON() 
+	public JSONObject toJSONObject() 
 	{
 		JSONObject j = new JSONObject();
 		j.put("id", id);
@@ -41,12 +50,12 @@ public class Form implements JSONReader, JSONWriter
 			j.put("parent", JSONObject.NULL);
 		
 		//TODO this might be adapted later
-		j.put("content",new JSONObject(content.toJSON().toString()));
+		j.put("content",content.toJSONObject());
 		return null;
 	}
 
 	@Override
-	public void fromJSON(JSONObject source) 
+	public void fromJSONObject(JSONObject source) 
 	{
 		init();
 		id=source.getString("id");
@@ -56,15 +65,26 @@ public class Form implements JSONReader, JSONWriter
 		{
 			JSONObject toputJSON= a.getJSONObject(i);
 			TypedValue toput = new TypedValue();
-			toput.fromJSON(toputJSON);
+			toput.fromJSONObject(toputJSON);
 			value.add(toput);
 		}
 		
 		//TODO
 		//source.getString("parent");
 		
-		content.fromJSON(source.getJSONObject("content"));
+		content=source.get("content", new IndexedMap<String,Form>());
+		//content.fromJSONObject(source.getJSONObject("content"));
 		
+	}
+	
+	protected JSONObject getValues(JSONObject toReturn)
+	{
+		toReturn.put(id, value);
+		for(int i=0; i<content.size(); i++)
+		{
+			content.getAt(i).value.getValues(toReturn);
+		}
+		return toReturn;
 	}
 
 }

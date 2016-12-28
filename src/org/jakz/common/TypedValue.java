@@ -4,7 +4,7 @@ package org.jakz.common;
  * @author johkal
  *
  */
-public class TypedValue implements JSONReader, JSONWriter
+public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 {
 	/**
 	 * Convention: as java.sql.Types
@@ -52,10 +52,13 @@ public class TypedValue implements JSONReader, JSONWriter
 	public TypedValue setBoolean(Boolean nBoolean)
 	{
 		init();
-		if(nBoolean)
-			valueInteger=1;
-		else
-			valueInteger=0;
+		if(nBoolean!=null)
+		{
+			if(nBoolean)
+				valueInteger=1;
+			else
+				valueInteger=0;
+		}
 		type=java.sql.Types.BOOLEAN;
 		return this;
 	}
@@ -110,7 +113,7 @@ public class TypedValue implements JSONReader, JSONWriter
 	public Double getValueDouble() {return valueDouble;}
 
 	@Override
-	public JSONObject toJSON() 
+	public JSONObject toJSONObject() 
 	{
 		JSONObject toreturn = new JSONObject();
 		toreturn.put("type", type);
@@ -131,7 +134,7 @@ public class TypedValue implements JSONReader, JSONWriter
 	}
 
 	@Override
-	public void fromJSON(JSONObject source) 
+	public void fromJSONObject(JSONObject source) 
 	{
 		init();
 		type=source.getInt("type");

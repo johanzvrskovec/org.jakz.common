@@ -4,8 +4,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.jakz.common.JSONArray;
+import org.jakz.common.JSONObject;
 
 public class DataEntry
 {
@@ -75,7 +75,7 @@ public class DataEntry
 	}
 	
 	public String getPath(){return path;}
-	public JSONObject getNamemap(){return namemap.toJSON();}
+	public JSONObject getNamemap(){return namemap.toJSONObject();}
 	public JSONArray getRows(){return rows;}
 	public boolean getMemory(){return memory;}
 	public boolean getTemporary(){return temporary;}
@@ -89,7 +89,7 @@ public class DataEntry
 	{
 		target.path=source.path;
 		target.namemap=source.namemap.copy();
-		target.rows=Util.copyJSONArrayInto(source.rows, new JSONArray());
+		target.rows= new JSONArray(source.rows.toString()); //Util.copyJSONArrayInto(source.rows, new JSONArray());
 		target.memory=source.memory;
 		target.temporary=source.temporary;
 		target.local=source.local;
@@ -107,7 +107,7 @@ public class DataEntry
 
 		path=json.getString("path");
 
-		namemap.fromJSON(json.optJSONObject("namemap"));
+		namemap.fromJSONObject(json.optJSONObject("namemap"));
 		
 		rows=json.optJSONArray("rows");
 		if(rows==null)

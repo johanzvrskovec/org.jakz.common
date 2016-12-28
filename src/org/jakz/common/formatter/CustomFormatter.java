@@ -1,7 +1,5 @@
 package org.jakz.common.formatter;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +12,6 @@ import java.nio.file.Files;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.apache.commons.csv.CSVFormat;
@@ -22,26 +19,21 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.FontUnderline;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.WorkbookUtil;
-import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.jakz.common.JSONArray;
+import org.jakz.common.JSONObject;
 import org.jakz.common.ApplicationException;
 import org.jakz.common.DataCache;
 import org.jakz.common.IndexedMap;
@@ -731,7 +723,7 @@ public class CustomFormatter
 		byte[] byteContent = Files.readAllBytes(settingInputFile.toPath());
 		Charset cs = Charset.forName("UTF-8");
 		JSONObject entryJSON = new JSONObject(new String(byteContent,cs));
-		entryTemplate.namemap.fromJSON(entryJSON.optJSONObject("namemap"));
+		entryTemplate.namemap.fromJSONObject(entryJSON.optJSONObject("namemap"));
 		entryTemplate.rows=entryJSON.getJSONArray("rows");
 		
 		if(dataCache.getHasTable(entryTemplate.path))
