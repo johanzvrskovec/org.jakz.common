@@ -505,8 +505,9 @@ public class CustomFormatter
 			for(int iCell=0; cellIt.hasNext(); iCell++)
 			{
 				currentCell = cellIt.next().toUpperCase();
+				String currentCellTrimmed  = currentCell.trim();
 				
-				if(iCell==0&&currentCell.trim().substring(0, 2).contains("##")) //is comment
+				if(iCell==0&&currentCellTrimmed.length()>1&&currentCellTrimmed.substring(0, 2).contains("##")) //is comment
 				{
 					isComment=true;
 					break;
@@ -514,12 +515,12 @@ public class CustomFormatter
 				
 				if(isNameRow)
 				{
-					if(settingFirstRowVariableNames||(iCell==0&&currentCell.trim().substring(0, 1).contains("#")))
+					if(settingFirstRowVariableNames||(iCell==0&&currentCellTrimmed.length()>0&&currentCellTrimmed.substring(0, 1).contains("#")))
 					{
 						//is name cell
-						if(iCell==0&&currentCell.trim().substring(0, 1).contains("#"))
+						if(iCell==0&&currentCellTrimmed.length()>0&&currentCellTrimmed.substring(0, 1).contains("#"))
 						{
-							currentCell=currentCell.replaceFirst("#", "");
+							currentCell=currentCellTrimmed.replaceFirst("#", "");
 						}
 						
 						fileColumns.add(currentCell);
@@ -545,6 +546,7 @@ public class CustomFormatter
 					}
 				}
 				else if(
+						//Keeps possibility to have cells with blankspace characters
 							currentCell.length()>0&&iCell<fileColumns.size() //is data cell
 							&&!(currentCell.contains(".")&&currentCell.length()==1) //special null encoding
 						)
