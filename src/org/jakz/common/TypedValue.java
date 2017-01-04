@@ -29,6 +29,12 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 		init();
 	}
 	
+	public TypedValue(Integer type) 
+	{
+		//init();
+		setType(type);
+	}
+	
 	/**
 	 * Also resets any stored values.
 	 * @param nType
@@ -138,19 +144,21 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	{
 		init();
 		type=source.getInt("type");
-		if(type==java.sql.Types.INTEGER)
-			setInteger(source.getInt("value"));
-		else if(type==java.sql.Types.DOUBLE)
-			setDouble(source.getDouble("value"));
-		else if(type==java.sql.Types.BOOLEAN)
-			setBoolean(source.getBoolean("value"));
-		else if(type==java.sql.Types.VARCHAR||type==java.sql.Types.NVARCHAR)
-			setVarchar(source.getString("value"));
-		else if(type==java.sql.Types.TIMESTAMP)
-			setTimestamp(source.getLong("value"));
-		else if(type==java.sql.Types.BIGINT)
-			setBigint(source.getLong("value"));
-		
+		if(source.has("value"))
+		{
+			if(type==java.sql.Types.INTEGER)
+				setInteger(source.getInt("value"));
+			else if(type==java.sql.Types.DOUBLE)
+				setDouble(source.getDouble("value"));
+			else if(type==java.sql.Types.BOOLEAN)
+				setBoolean(source.getBoolean("value"));
+			else if(type==java.sql.Types.VARCHAR||type==java.sql.Types.NVARCHAR)
+				setVarchar(source.getString("value"));
+			else if(type==java.sql.Types.TIMESTAMP)
+				setTimestamp(source.getLong("value"));
+			else if(type==java.sql.Types.BIGINT)
+				setBigint(source.getLong("value"));
+		}	
 	}
 	
 }

@@ -39,7 +39,10 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public String getGlobalID()
 	{
-		return parent.getGlobalID()+"."+id;
+		if(parent!=null)
+			return parent.getGlobalID()+"."+id;
+		else
+			return id;
 	}
 
 	@Override
@@ -57,7 +60,7 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 			j.put("parent", JSONObject.NULL);
 		
 		j.put("content",content.values());
-		return null;
+		return j;
 	}
 
 	@Override
@@ -92,6 +95,12 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 	public boolean getHasContent()
 	{
 		return content!=null&&content.size()>0;
+	}
+	
+	public Form addContent(Form nContent)
+	{
+		content.put(nContent.id, nContent);
+		return this;
 	}
 	
 	protected JSONObject getValues(JSONObject toReturn)
