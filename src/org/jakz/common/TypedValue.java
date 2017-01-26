@@ -15,6 +15,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	private Double valueDouble;
 	private Long valueLong;
 	
+	public boolean required,nullable;
+	
 	private void init()
 	{
 		type=null;
@@ -22,6 +24,9 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 		valueInteger=null;
 		valueDouble=null;
 		valueLong=null;
+		
+		required=false;
+		nullable=false;
 	}
 	
 	public TypedValue() 
@@ -136,6 +141,9 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 		else if(type==java.sql.Types.BIGINT)
 			toreturn.put("value", valueLong);
 		
+		toreturn.put("required", required);
+		toreturn.put("nullable", nullable);
+		
 		return toreturn;
 	}
 
@@ -158,6 +166,9 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 				setTimestamp(source.getLong("value"));
 			else if(type==java.sql.Types.BIGINT)
 				setBigint(source.getLong("value"));
+			
+			required=source.optBoolean("required");
+			nullable=source.optBoolean("nullable");
 		}	
 	}
 	

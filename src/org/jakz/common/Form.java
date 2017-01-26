@@ -8,17 +8,30 @@ import org.jakz.common.Form.FieldType;
  * @author johan
  *
  */
+
+//TODO use modified DataEntry? Merge DataEntry and Form
 public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 {
 	public static enum FieldType {FORM,QUERY,INFO};
 	
+	/**
+	 * Codeable identifier for the form object
+	 */
 	public String id;
 	public FieldType type;
+	/**
+	 * Human readable name text
+	 */
 	public String name;
+	/**
+	 * Human readable descriptive text
+	 */
 	public String text;
 	public ArrayList<TypedValue> value;
 	protected Form parent;
 	public IndexedMap<String,Form> content;
+	
+	public boolean required;
 	
 	private void init()
 	{
@@ -28,6 +41,8 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		
 		name="";
 		text="";
+		
+		required =false;
 	}
 
 	public Form(String nid, FieldType ntype) 
@@ -60,6 +75,9 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 			j.put("parent", JSONObject.NULL);
 		
 		j.put("content",content.values());
+		
+		j.put("required",required);
+		
 		return j;
 	}
 
@@ -69,7 +87,7 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		init();
 		id=source.getString("id");
 		name=source.getString("name");
-		text=source.getString("text");
+		text=source.optString("text");
 		type=FieldType.valueOf(source.getString("type").toUpperCase());
 		JSONArray a = source.getJSONArray("value");
 		for(int i=0; i<a.length(); i++)
@@ -89,6 +107,8 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 			newForm.parent=this;
 			content.put(newForm.id, newForm);
 		}
+		
+		required=source.optBoolean("required");
 		
 	}
 	
