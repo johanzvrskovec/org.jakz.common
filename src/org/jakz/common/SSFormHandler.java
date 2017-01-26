@@ -1,6 +1,7 @@
 package org.jakz.common;
 
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -26,12 +27,17 @@ public class SSFormHandler
 		for(int rowi=0; result.next(); rowi++)
 		{
 			Form rowForm = new Form(""+rowi,Form.FieldType.FORM);
-			for(int coli=0; coli<resultMeta.getColumnCount(); coli++)
+			rowForm.name=""+rowi;
+			int colCount = resultMeta.getColumnCount();
+			System.out.println("col count = "+colCount);
+			for(int coli=1; coli<=colCount; coli++)  //index from 1
 			{
-				
 				String columnName = resultMeta.getColumnName(coli);
 				int columnType = resultMeta.getColumnType(coli);
+				String columnTypeName = resultMeta.getColumnTypeName(coli);
 				int columnNullable = resultMeta.isNullable(coli);
+				int jdbcnvarcharordinal = JDBCType.NVARCHAR.ordinal();
+				int jdbcvarcharordinal = JDBCType.VARCHAR.ordinal();
 				Form columnForm = new Form(tableName+"."+columnName, Form.FieldType.QUERY);
 				TypedValue tv = new TypedValue(columnType);
 				
@@ -63,7 +69,7 @@ public class SSFormHandler
 					{
 						tv.setVarchar(result.getString(coli));
 					}
-					else if(columnType==java.sql.Types.NVARCHAR)
+					else if(columnType==java.sql.Types.NVARCHAR||columnType==-16) //TODO why does SQL server give -16 for nvarchar(max)?
 					{
 						tv.setNvarchar(result.getString(coli));
 					}
