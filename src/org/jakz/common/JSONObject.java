@@ -479,6 +479,28 @@ public class JSONObject extends org.json.JSONObject implements Serializable
         return string;
     }
 
+    //TODO
+    /**
+     * Adapted. Get the value object associated with a key. UNTESTED!
+     *
+     * @param key
+     *            A key string.
+     * @return The object associated with the key.
+     * @throws JSONException
+     *             if the key is not found.
+     */
+    public <E> E get(String key, E template) throws JSONException 
+    {
+        if (key == null) {
+            throw new JSONException("Null key.");
+        }
+        E object = this.opt(key,template);
+        if (object == null) {
+            throw new JSONException("JSONObject[" + quote(key) + "] not found.");
+        }
+        return object;
+    }
+    
     /**
      * Get the value object associated with a key.
      *
@@ -885,8 +907,52 @@ public class JSONObject extends org.json.JSONObject implements Serializable
      *            A key string.
      * @return An object which is the value, or null if there is no value.
      */
-    public Object opt(String key) {
+    public Object opt(String key) 
+    {
         return key == null ? null : this.map.get(key);
+    }
+    
+    
+    //TODO
+    /**
+     * Adapted opt for getting custom classes. UNTESTED!
+     * @param key
+     * @param template
+     * @return
+     */
+    public <E> E opt(String key, E template) 
+    {
+    	if(key==null)
+    		return null;
+    	
+    	Object val = this.opt(key);
+    	
+    	if(val!=null)
+    	{
+    		if(template instanceof JSONObjectReadAspect)
+    		{
+    			((JSONObjectReadAspect) template).fromJSONObject((JSONObject)val);
+    			return template;
+    		}
+    		
+    		/*
+    		if (
+    				NULL.equals(template)
+                        || template instanceof Byte || template instanceof Character
+                        || template instanceof Short || template instanceof Integer
+                        || template instanceof Long || template instanceof Boolean
+                        || template instanceof Float || template instanceof Double
+                        || template instanceof String || template instanceof BigInteger
+                        || template instanceof BigDecimal
+               )
+                    return (E)val;
+    		*/
+    		return (E) val;
+            
+    		//throw new JSONException("Undefined conversion into Java object");
+    	}
+    	
+    	return template;
     }
 
     /**
@@ -1744,6 +1810,10 @@ public class JSONObject extends org.json.JSONObject implements Serializable
                     || object.getClass().getClassLoader() == null) {
                 return object.toString();
             }
+            
+            if(object instanceof JSONObjectWriteAspect)
+            	return ((JSONObjectWriteAspect) object).toJSONObject();
+            
             return new JSONObject(object);
         } catch (Exception exception) {
             return null;

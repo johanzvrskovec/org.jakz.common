@@ -9,10 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-public class IndexedMap<K,V> //implements Map<K, V>
+public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAspect //implements Map<K, V>
 {
 	public class IndexedValue
 	{
@@ -283,7 +280,7 @@ public class IndexedMap<K,V> //implements Map<K, V>
 		return subList(fromIndex, listK.size());
 	}
 	
-	public JSONObject toJSON()
+	public JSONObject toJSONObject()
 	{
 		JSONObject toReturn = new JSONObject();
 		JSONArray jsonListK = new JSONArray();
@@ -311,9 +308,8 @@ public class IndexedMap<K,V> //implements Map<K, V>
 		return toReturn;
 	}
 	
-	
 	@SuppressWarnings("unchecked")
-	public IndexedMap<K,V> fromJSON(JSONObject json)
+	public void fromJSONObject(JSONObject json)
 	{
 		clear();
 		if(json!=null)
@@ -325,13 +321,13 @@ public class IndexedMap<K,V> //implements Map<K, V>
 			{
 				for(int i=0; i<json_listK.length(); i++)
 				{
-						K key = (K)json_listK.get(i);
-						V value = (V) json_mapKV.get(key.toString());
-						
-						if(json_mapKI.getInt(key.toString())!=i)
-							throw new java.lang.IllegalArgumentException("The mapped index of this key does not represent the index of the key in the internal list.");
-						
-						put(key, value);
+					K key = (K)json_listK.get(i);
+					V value = (V) json_mapKV.get(key.toString());
+					
+					if(json_mapKI.getInt(key.toString())!=i)
+						throw new java.lang.IllegalArgumentException("The mapped index of this key does not represent the index of the key in the internal list.");
+					
+					put(key, value);
 				}
 			}
 			catch (Exception e)
@@ -339,13 +335,12 @@ public class IndexedMap<K,V> //implements Map<K, V>
 				throw new java.lang.IllegalArgumentException("The argument is of the wrong format or has an incoherent internal structure.",e);
 			}
 		}
-		return this;
 	}
 	
 	
 	public String toString()
 	{
-		return toJSON().toString();
+		return toJSONObject().toString();
 	}
 
 }

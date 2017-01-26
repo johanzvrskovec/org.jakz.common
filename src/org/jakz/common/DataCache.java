@@ -15,9 +15,9 @@ import org.apache.commons.lang.StringUtils;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.server.TcpServer;
 import org.h2.tools.Server;
-import org.json.JSONArray;
+import org.jakz.common.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.jakz.common.JSONObject;
 
 
 /**
