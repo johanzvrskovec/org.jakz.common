@@ -45,6 +45,23 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		required =false;
 	}
 
+	/**
+	 * Shallow copy of source into this
+	 * @param source
+	 * @return
+	 */
+	public Form scopy(Form source)
+	{
+		id=source.id;
+		type=source.type;
+		name=source.name;
+		text=source.text;
+		value=source.value;
+		parent=source.parent;
+		content=source.content;
+		return this;	
+	}
+	
 	public Form(String nid, FieldType ntype) 
 	{
 		init();
