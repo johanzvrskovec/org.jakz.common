@@ -1,8 +1,6 @@
 package org.jakz.common;
 
 import java.util.ArrayList;
-
-import org.jakz.common.Form.FieldType;
 /**
  * The Form is either a complete form or a nested element in a form.
  * @author johan
@@ -30,8 +28,7 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 	public ArrayList<TypedValue> value;
 	protected Form parent;
 	public IndexedMap<String,Form> content;
-	
-	public boolean required;
+	public boolean required,nullable,writeable,tablekey;
 	
 	private void init()
 	{
@@ -43,6 +40,9 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		text="";
 		
 		required =false;
+		nullable = true;
+		writeable = false;
+		tablekey = false;
 	}
 
 	/**
@@ -59,6 +59,10 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		value=source.value;
 		parent=source.parent;
 		content=source.content;
+		required=source.required;
+		nullable=source.nullable;
+		writeable=source.writeable;
+		tablekey=source.tablekey;
 		return this;	
 	}
 	
@@ -94,6 +98,9 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		j.put("content",content.values());
 		
 		j.put("required",required);
+		j.put("nullable",nullable);
+		j.put("writeable",writeable);
+		j.put("tablekey",tablekey);
 		
 		return j;
 	}
@@ -126,6 +133,9 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		}
 		
 		required=source.optBoolean("required");
+		nullable=source.optBoolean("nullable");
+		writeable=source.optBoolean("writeable");
+		tablekey=source.optBoolean("tablekey");
 		
 	}
 	
@@ -137,6 +147,7 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 	public Form addContent(Form nContent)
 	{
 		content.put(nContent.id, nContent);
+		nContent.parent=this;
 		return this;
 	}
 	
@@ -148,6 +159,11 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 			content.getAt(i).value.getValues(toReturn);
 		}
 		return toReturn;
+	}
+	
+	public String toString()
+	{
+		return toJSONObject().toString();
 	}
 
 }

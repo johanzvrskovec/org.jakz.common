@@ -12,7 +12,6 @@ import org.jakz.common.Form.FieldType;
 
 public class SSFormHandler
 {
-	
 	//TODO use modified DataEntry? Merge DataEntry and Form
 	public static Form produceFormFromDBTable(String tableName, boolean withData, int dataLimit, Connection c) throws SQLException, ApplicationException
 	{
@@ -36,12 +35,25 @@ public class SSFormHandler
 			for(int coli=1; coli<=colCount; coli++)  //index from 1
 			{
 				String columnName = resultMeta.getColumnName(coli);
+				Form columnForm = new Form(columnName, Form.FieldType.QUERY);
+				columnForm.name=columnName;
+				
 				int columnType = resultMeta.getColumnType(coli);
 				String columnTypeName = resultMeta.getColumnTypeName(coli);
-				int columnNullable = resultMeta.isNullable(coli);
-				int jdbcnvarcharordinal = JDBCType.NVARCHAR.ordinal();
-				int jdbcvarcharordinal = JDBCType.VARCHAR.ordinal();
-				Form columnForm = new Form(tableName+"."+columnName, Form.FieldType.QUERY);
+				int resultSetNullability = resultMeta.isNullable(coli);
+				if(ResultSetMetaData.columnNoNulls==resultSetNullability)
+					columnForm.nullable=false;
+				else if(ResultSetMetaData.columnNullable==resultSetNullability)
+					columnForm.nullable=true;
+				else if(ResultSetMetaData.columnNullableUnknown==resultSetNullability)
+					columnForm.nullable=true;
+				else throw new ApplicationException("Unrecognizeable nullability status when parsing Form");
+				//int jdbcnvarcharordinal = JDBCType.NVARCHAR.ordinal();
+				//int jdbcvarcharordinal = JDBCType.VARCHAR.ordinal();
+				
+				
+				columnForm.writeable=resultMeta.isWritable(coli);
+				
 				TypedValue tv = new TypedValue(columnType);
 				
 				if(withData)
@@ -80,9 +92,9 @@ public class SSFormHandler
 						}
 						else throw new ApplicationException("Could not parse Form value of table "+tableName+", column "+columnName+" with type "+columnType+" at relative line index "+rowi);
 					}
-					
-					columnForm.value.add(tv);
 				}
+				
+				columnForm.value.add(tv);
 				
 				rowForm.addContent(columnForm);
 			}
