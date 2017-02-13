@@ -9,5 +9,5 @@ package org.jakz.common;
  */
 public interface JSONObjectReadAspect
 {
-	public void fromJSONObject(JSONObject source);
+	public void fromJSONObject(org.jakz.common.JSONObject source);
 }

@@ -82,9 +82,9 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 	}
 
 	@Override
-	public JSONObject toJSONObject() 
+	public org.jakz.common.JSONObject toJSONObject() 
 	{
-		JSONObject j = new JSONObject();
+		org.jakz.common.JSONObject j = new JSONObject();
 		j.put("id", id);
 		j.put("name", name);
 		j.put("text", text);
@@ -93,7 +93,7 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		if(parent!=null)
 			j.put("parent", parent.id);
 		else
-			j.put("parent", JSONObject.NULL);
+			j.put("parent", org.jakz.common.JSONObject.NULL);
 		
 		j.put("content",content.values());
 		
@@ -106,24 +106,24 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 	}
 
 	@Override
-	public void fromJSONObject(JSONObject source) 
+	public void fromJSONObject(org.jakz.common.JSONObject source) 
 	{
 		init();
 		id=source.getString("id");
 		name=source.getString("name");
 		text=source.optString("text");
 		type=FieldType.valueOf(source.getString("type").toUpperCase());
-		JSONArray a = source.getJSONArray("value");
+		org.jakz.common.JSONArray a = source.getJSONArray("value");
 		for(int i=0; i<a.length(); i++)
 		{
-			JSONObject toputJSON= a.getJSONObject(i);
+			org.jakz.common.JSONObject toputJSON= a.getJSONObject(i);
 			TypedValue toput = new TypedValue();
 			toput.fromJSONObject(toputJSON);
 			value.add(toput);
 		}
 		
 		content=new IndexedMap<String,Form>();
-		JSONArray contentArray = source.getJSONArray("content");
+		org.jakz.common.JSONArray contentArray = source.getJSONArray("content");
 		for(int i=0; i<contentArray.length(); i++)
 		{
 			Form newForm = new Form("DEFAULT", FieldType.FORM);
@@ -151,7 +151,7 @@ public class Form implements JSONObjectReadAspect, JSONObjectWriteAspect
 		return this;
 	}
 	
-	protected JSONObject getValues(JSONObject toReturn)
+	protected org.jakz.common.JSONObject getValues(org.jakz.common.JSONObject toReturn)
 	{
 		toReturn.put(id, value);
 		for(int i=0; i<content.size(); i++)

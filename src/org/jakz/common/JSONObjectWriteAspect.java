@@ -9,5 +9,5 @@ package org.jakz.common;
  */
 public interface JSONObjectWriteAspect 
 {
-	public JSONObject toJSONObject();
+	public org.jakz.common.JSONObject toJSONObject();
 }
