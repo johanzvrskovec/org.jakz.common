@@ -668,19 +668,19 @@ public class CustomFormatter
 					
 					if(type==java.sql.Types.INTEGER)
 					{
-						variableValueToAdd.put("value", Integer.parseInt(currentCell));
+						variableValueToAdd.put("value", Integer.parseInt(getFirstCommaArrayElement(currentCell)));
 					}
 					else if(type==java.sql.Types.BIGINT)
 					{
-						variableValueToAdd.put("value", Long.parseLong(currentCell));
+						variableValueToAdd.put("value", Long.parseLong(getFirstCommaArrayElement(currentCell)));
 					}
 					else if(type==java.sql.Types.DOUBLE)
 					{
-						variableValueToAdd.put("value", Double.parseDouble(currentCell));
+						variableValueToAdd.put("value", Double.parseDouble(getFirstCommaArrayElement(currentCell)));
 					}
 					else if(type==java.sql.Types.BOOLEAN)
 					{
-						variableValueToAdd.put("value", Boolean.parseBoolean(currentCell));
+						variableValueToAdd.put("value", Boolean.parseBoolean(getFirstCommaArrayElement(currentCell)));
 					}
 					else if(type==java.sql.Types.VARCHAR)
 					{
@@ -718,6 +718,15 @@ public class CustomFormatter
 			entryTemplate.rows=rowBuffer;
 			dataCache.enter(entryTemplate);
 		}
+	}
+	
+	private String getFirstCommaArrayElement(String input)
+	{
+		String[] parts = input.split(",");
+		if(parts.length>0)
+			return parts[0];
+		else return input;
+			
 	}
 	
 	private void readDatacacheRows(DataEntry entryTemplate) throws InvalidFormatException, IOException, SQLException, ApplicationException
