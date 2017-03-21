@@ -4,6 +4,13 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * DEPRECATED utility class
+ * Use classes in org.jakz.common.util
+ * @author johkal
+ *
+ */
+@Deprecated
 public class Util 
 {
 
