@@ -11,11 +11,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPCompressedDataGenerator;
 import org.bouncycastle.openpgp.PGPEncryptedData;
@@ -35,29 +39,113 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.util.io.Streams;
+import org.jakz.common.util.FileUtil;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/**
+ * Class to process files: encryption, compression et.c.
+ * To use BouncyCastle encryption methods, you will have to {@code Security.addProvider(new BouncyCastleProvider());}
+ * @author johkal
+ *
+ */
 public class FileProcessor 
 {
 	public static final int BUFFER_SIZE = 16384;
 	
-	public static void unzipFile(String inputFilePath, String outputFilePath) throws IOException
+	protected HashSet<String> temporaryFileSafeDeleteCollection = new HashSet<String>();
+	
+	/**
+	 * Must be used on a non-existing File to be able to use {@link FileProcessor.safeDeleteTemporaryFile} on it.
+	 * @param toBeDeleted
+	 * @throws IOException
+	 */
+	public void markTemporaryFileForSafeDeletion(File toBeDeleted) throws IOException
 	{
-		ZipFile zipFile = new ZipFile(inputFilePath);
+		boolean safe = false;
+		if(toBeDeleted.exists())
+		{
+			if(toBeDeleted.isDirectory())
+			{
+				safe = toBeDeleted.list().length==0;
+			}
+		}
+		else
+			safe=true;
+		
+		if(!safe)
+			throw new IOException("This file or folder is not safe for deletion, because it is not empty or non existant.");
+		
+		temporaryFileSafeDeleteCollection.add(toBeDeleted.getAbsolutePath());
+	}
+	
+	/**
+	 * Deletes a file in a safe way to avoid unintentional deletion of existing files and folders. 
+	 * @param toBeDeleted
+	 * @param fallbackToDeleteOnExit
+	 * @return true if the file was determined to not exist anymore or if the file was determined to be safe according to the use of {@link FileProcessor.markTemporaryFileForSafeDeletion} and a successful delete operation on it was performed. false otherwise.
+	 * @throws IOException
+	 */
+	public boolean safeDeleteTemporaryFile(File toBeDeleted, boolean fallbackToDeleteOnExit) throws IOException
+	{
+		if(!toBeDeleted.exists())
+			return true;
+		
+		boolean safe=false;
+		String toBeDeletedPath = toBeDeleted.getAbsolutePath();
+		safe = temporaryFileSafeDeleteCollection.contains(toBeDeletedPath);
+		if(safe)
+		{
+			temporaryFileSafeDeleteCollection.remove(toBeDeletedPath);
+			if(toBeDeleted.isFile())
+				return FileUtil.deleteFileIfExistsOldCompatSafe(toBeDeleted,fallbackToDeleteOnExit);
+			else if(toBeDeleted.isDirectory())
+				return FileUtil.deleteDirectoryIfExistsOldCompatSafe(toBeDeleted,true,fallbackToDeleteOnExit);
+			else
+				throw new IOException("File to be deleted is of unknown type.");
+		}
+		else
+			return false;
+	}
+	
+	/**
+	 * Unzips a file to a destination directory.
+	 * @param inputFile
+	 * @param outputDir
+	 * @throws IOException
+	 */
+	public static void unzipFile(File inputFile, File outputDir, boolean overwrite) throws IOException
+	{
+		unzipFile(inputFile,outputDir,overwrite,null);
+	}
+	
+	/**
+	 * Unzips a file to a destination directory. If zipEntries is passed, will contain the processed entries.
+	 * @param inputFile
+	 * @param outputDir
+	 * @param zipEntries Will be filled with the processed entries
+	 * @throws IOException
+	 */
+	public static void unzipFile(File inputFile, File outputDir, boolean overwrite, HashMap<String,ZipEntry> zipEntries) throws IOException
+	{
+		ZipFile zipFile = new ZipFile(inputFile);
 		try 
 		{
 		  Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		  while (entries.hasMoreElements()) 
 		  {
 		    ZipEntry entry = entries.nextElement();
-		    File entryDestination = new File(outputFilePath,  entry.getName());
+		    if(zipEntries!=null)
+		    	zipEntries.put(entry.getName(), entry);
+		    File entryDestination = new File(outputDir,  entry.getName());
 		    if (entry.isDirectory()) 
 		    {
 		        entryDestination.mkdirs();
 		    } else 
 		    {
+		    	if(entryDestination.exists()&&!overwrite)
+		    		throw new IOException("File "+entry.getName()+" exists already in the target location.");
 		        entryDestination.getParentFile().mkdirs();
 		        InputStream in = zipFile.getInputStream(entry);
 		        OutputStream out = new FileOutputStream(entryDestination);
@@ -79,18 +167,18 @@ public class FileProcessor
 		}
 	}
 	
-	public static void decryptFile
+	public static void PGPDecryptFile
 	(
-	        String inputFilePath,
-	        String keyFilePath,
+	        File inputFile,
+	        File secretKeyFile,
 	        char[] passwd,
-	        String outputFilePath)
+	        File outputFile)
 	        throws IOException, NoSuchProviderException
 	    {
-	        InputStream in = new BufferedInputStream(new FileInputStream(inputFilePath));
-	        InputStream keyIn = new BufferedInputStream(new FileInputStream(keyFilePath));
-	        OutputStream out = new BufferedOutputStream(new FileOutputStream(outputFilePath));
-	        decryptFile(in, keyIn, passwd, out);
+	        InputStream in = new BufferedInputStream(new FileInputStream(inputFile));
+	        InputStream keyIn = new BufferedInputStream(new FileInputStream(secretKeyFile));
+	        OutputStream out = new BufferedOutputStream(new FileOutputStream(outputFile));
+	        PGPDecryptFile(in, keyIn, passwd, out);
 	        keyIn.close();
 	        in.close();
 	        out.close();
@@ -99,10 +187,10 @@ public class FileProcessor
 	    /**
 	     * decrypt the passed in message stream
 	     */
-	    public static void decryptFile
+	    public static void PGPDecryptFile
 	    (
 	        InputStream in,
-	        InputStream keyIn,
+	        InputStream secretKeyIn,
 	        char[]      passwd,
 	        OutputStream out)
 	        throws IOException, NoSuchProviderException
@@ -134,13 +222,13 @@ public class FileProcessor
 	            PGPPrivateKey               sKey = null;
 	            PGPPublicKeyEncryptedData   pbe = null;
 	            PGPSecretKeyRingCollection  pgpSec = new PGPSecretKeyRingCollection(
-	                PGPUtil.getDecoderStream(keyIn));
+	                PGPUtil.getDecoderStream(secretKeyIn));
 
 	            while (sKey == null && it.hasNext())
 	            {
 	                pbe = (PGPPublicKeyEncryptedData)it.next();
 	                
-	                sKey = findSecretKey(pgpSec, pbe.getKeyID(), passwd);
+	                sKey = PGPFindSecretKey(pgpSec, pbe.getKeyID(), passwd);
 	            }
 	            
 	            if (sKey == null)
@@ -214,7 +302,7 @@ public class FileProcessor
 	     * @throws PGPException
 	     * @throws NoSuchProviderException
 	     */
-	    static PGPPrivateKey findSecretKey(PGPSecretKeyRingCollection pgpSec, long keyID, char[] pass)
+	    static PGPPrivateKey PGPFindSecretKey(PGPSecretKeyRingCollection pgpSec, long keyID, char[] pass)
 	        throws PGPException, NoSuchProviderException
 	    {
 	        PGPSecretKey pgpSecKey = pgpSec.getSecretKey(keyID);
@@ -225,110 +313,6 @@ public class FileProcessor
 	        }
 
 	        return pgpSecKey.extractPrivateKey(pass, "BC");
-	    }
-	    
-	    static PGPPublicKey readPublicKey(String fileName) throws IOException, PGPException
-	    {
-	        InputStream keyIn = new BufferedInputStream(new FileInputStream(fileName));
-	        PGPPublicKey pubKey = readPublicKey(keyIn);
-	        keyIn.close();
-	        return pubKey;
-	    }
-
-	    /**
-	     * A simple routine that opens a key ring file and loads the first available key
-	     * suitable for encryption.
-	     * 
-	     * @param input
-	     * @return
-	     * @throws IOException
-	     * @throws PGPException
-	     */
-	    static PGPPublicKey readPublicKey(InputStream input) throws IOException, PGPException
-	    {
-	        PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(
-	            PGPUtil.getDecoderStream(input));
-
-	        //
-	        // we just loop through the collection till we find a key suitable for encryption, in the real
-	        // world you would probably want to be a bit smarter about this.
-	        //
-
-	        Iterator keyRingIter = pgpPub.getKeyRings();
-	        while (keyRingIter.hasNext())
-	        {
-	            PGPPublicKeyRing keyRing = (PGPPublicKeyRing)keyRingIter.next();
-
-	            Iterator keyIter = keyRing.getPublicKeys();
-	            while (keyIter.hasNext())
-	            {
-	                PGPPublicKey key = (PGPPublicKey)keyIter.next();
-
-	                if (key.isEncryptionKey())
-	                {
-	                    return key;
-	                }
-	            }
-	        }
-
-	        throw new IllegalArgumentException("Can't find encryption key in key ring.");
-	    }
-
-	    static PGPSecretKey readSecretKey(String fileName) throws IOException, PGPException
-	    {
-	        InputStream keyIn = new BufferedInputStream(new FileInputStream(fileName));
-	        PGPSecretKey secKey = readSecretKey(keyIn);
-	        keyIn.close();
-	        return secKey;
-	    }
-
-	    /**
-	     * A simple routine that opens a key ring file and loads the first available key
-	     * suitable for signature generation.
-	     * 
-	     * @param input stream to read the secret key ring collection from.
-	     * @return a secret key.
-	     * @throws IOException on a problem with using the input stream.
-	     * @throws PGPException if there is an issue parsing the input stream.
-	     */
-	    static PGPSecretKey readSecretKey(InputStream input) throws IOException, PGPException
-	    {
-	        PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(
-	            PGPUtil.getDecoderStream(input));
-
-	        //
-	        // we just loop through the collection till we find a key suitable for encryption, in the real
-	        // world you would probably want to be a bit smarter about this.
-	        //
-
-	        Iterator keyRingIter = pgpSec.getKeyRings();
-	        while (keyRingIter.hasNext())
-	        {
-	            PGPSecretKeyRing keyRing = (PGPSecretKeyRing)keyRingIter.next();
-
-	            Iterator keyIter = keyRing.getSecretKeys();
-	            while (keyIter.hasNext())
-	            {
-	                PGPSecretKey key = (PGPSecretKey)keyIter.next();
-
-	                if (key.isSigningKey())
-	                {
-	                    return key;
-	                }
-	            }
-	        }
-
-	        throw new IllegalArgumentException("Can't find signing key in key ring.");
-	    }
-	    
-	    static byte[] compressFile(String fileName, int algorithm) throws IOException
-	    {
-	        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-	        PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(algorithm);
-	        PGPUtil.writeFileToLiteralData(comData.open(bOut), PGPLiteralData.BINARY,
-	            new File(fileName));
-	        comData.close();
-	        return bOut.toByteArray();
 	    }
 
 }

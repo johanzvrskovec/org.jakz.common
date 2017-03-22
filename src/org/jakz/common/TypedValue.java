@@ -1,4 +1,8 @@
 package org.jakz.common;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * Typically used for values that has to be serialized together with its type
  * @author johkal
@@ -15,6 +19,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	private Double valueDouble;
 	private Long valueLong;
 	
+	private Integer sizeLimit;
+	
 	public boolean required,nullable;
 	
 	private void init()
@@ -24,9 +30,32 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 		valueInteger=null;
 		valueDouble=null;
 		valueLong=null;
+		sizeLimit=null;
 		
 		required=false;
 		nullable=false;
+	}
+	
+	public TypedValue scopy(TypedValue source)
+	{
+		type=source.type;
+		valueString=source.valueString;
+		valueInteger=source.valueInteger;
+		valueDouble=source.valueDouble;
+		valueLong=source.valueLong;
+		
+		sizeLimit=source.sizeLimit;
+		required=source.required;
+		nullable=source.nullable;
+		
+		return this;
+	}
+	
+	public TypedValue createNewScopy()
+	{
+		TypedValue toReturn = new TypedValue();
+		toReturn.scopy(this);
+		return toReturn;
 	}
 	
 	public TypedValue() 
@@ -34,10 +63,17 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 		init();
 	}
 	
-	public TypedValue(Integer type) 
+	public TypedValue(Integer nType) 
 	{
 		//init();
-		setType(type);
+		setType(nType);
+	}
+	
+	public TypedValue(Integer nType, Integer nSizeLimit) 
+	{
+		//init();
+		setType(nType);
+		setSizeLimit(nSizeLimit);
 	}
 	
 	/**
@@ -114,6 +150,12 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 		return this;
 	}
 	
+	public TypedValue setSizeLimit(Integer nSizeLimit)
+	{
+		sizeLimit=nSizeLimit;
+		return this;
+	}
+	
 	public Integer getType() {return type;}
 	public Integer getValueInteger() {return valueInteger;}
 	public Boolean getValueBoolean() {return valueInteger!=0;}
@@ -122,6 +164,31 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	public Long getValueTimestamp() {return valueLong;}
 	public Long getValueBigint() {return valueLong;}
 	public Double getValueDouble() {return valueDouble;}
+	
+	public Integer getSizeLimit() {return sizeLimit;}
+	
+	
+	public TypedValue setValueFromSQLResultSet(ResultSet r, String columnLabel) throws SQLException, OperationException
+	{
+		if(type==java.sql.Types.INTEGER)
+			setInteger(r.getInt(columnLabel));
+		else if(type==java.sql.Types.DOUBLE)
+			setDouble(r.getDouble(columnLabel));
+		else if(type==java.sql.Types.BOOLEAN)
+			setBoolean(r.getBoolean(columnLabel));
+		else if(type==java.sql.Types.VARCHAR)
+			setVarchar(r.getString(columnLabel));
+		else if(type==java.sql.Types.NVARCHAR)
+			setNvarchar(r.getString(columnLabel));
+		else if(type==java.sql.Types.TIMESTAMP)
+			setTimestamp(r.getTimestamp(columnLabel).getTime());
+		else if(type==java.sql.Types.BIGINT)
+			setBigint(r.getLong(columnLabel));
+		else
+			throw new OperationException("SQL type unknown to TypedValue");
+		
+		return this;
+	}
 
 	@Override
 	public JSONObject toJSONObject() 
@@ -140,6 +207,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 			toreturn.put("value", valueLong);
 		else if(type==java.sql.Types.BIGINT)
 			toreturn.put("value", valueLong);
+		
+		toreturn.put("sizeLimit", sizeLimit);
 		
 		toreturn.put("required", required);
 		toreturn.put("nullable", nullable);
@@ -167,6 +236,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 			else if(type==java.sql.Types.BIGINT)
 				setBigint(source.getLong("value"));
 			
+			if(source.has("sizeLimit"))
+				sizeLimit=source.getInt("sizeLimit");
 			required=source.optBoolean("required");
 			nullable=source.optBoolean("nullable");
 		}	

@@ -7,9 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAspect //implements Map<K, V>
+public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAspect, Iterable<V> //implements Map<K, V>
 {
 	public class IndexedValue
 	{
@@ -67,16 +68,32 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 	
 	public IndexedMap<K,V> put(K nkey, V nvalue, Integer index)
 	{	
+		boolean hasKey = getHasKey(nkey);
 		mapKV.put(nkey, nvalue);
 		
 		if(index==null)
 		{
-			listK.add(nkey);
-			index=listK.size()-1;
+			if(hasKey)
+				index = mapKI.get(nkey);
+			else
+			{
+				listK.add(nkey);
+				index=listK.size()-1;
+			}
 		}
 		else
 		{
-			listK.add(index, nkey);
+			if(hasKey)
+			{
+				int iToRemove = mapKI.get(nkey);
+				if(iToRemove!=index)
+				{
+					listK.remove(iToRemove);
+					listK.add(index, nkey);
+				}
+			}
+			else
+				listK.add(index, nkey);
 		}
 		
 		mapKI.put(nkey, index);
@@ -121,10 +138,17 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		return mapKV.entrySet();
 	}
 	 */
+	
+	public boolean getHasKey(K key)
+	{
+		return mapKV.get(key)!=null;
+	}
 
 	public IndexedValue get(K key) 
 	{
+		if(mapKV.get(key)!=null)
 		return new IndexedValue(mapKI.get(key),mapKV.get(key));
+		else return null;
 	}
 	
 	public V getValue(K key) 
@@ -341,6 +365,58 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 	public String toString()
 	{
 		return toJSONObject().toString();
+	}
+	
+	public static class IndexedMapIterator<K,V> implements Iterator<V> 
+	{
+
+        private final IndexedMap<K,V> indexedMap;
+        //private int current;
+        Iterator<K> listIterator;
+        K currentKey;
+
+        IndexedMapIterator(IndexedMap<K,V> theIndexedMapToTraverse) 
+        {
+        	indexedMap = theIndexedMapToTraverse;
+            listIterator = indexedMap.listK.iterator();
+            currentKey=null;
+        }
+
+        @Override
+        public boolean hasNext() 
+        {
+            return listIterator.hasNext();
+        }
+
+        @Override
+        public V next() 
+        {
+            if (!listIterator.hasNext())   throw new NoSuchElementException();
+            
+            currentKey = listIterator.next();
+            return indexedMap.mapKV.get(currentKey);
+        }
+
+        /**
+         * Untested
+         */
+        @Override
+        public void remove()
+        {
+        	if(currentKey==null)
+        		throw new IllegalStateException();
+            
+        	indexedMap.remove(currentKey);
+        	currentKey=null;
+        }
+    }
+
+
+
+	@Override
+	public Iterator<V> iterator() 
+	{
+		return new IndexedMapIterator<K,V>(this);
 	}
 
 }
