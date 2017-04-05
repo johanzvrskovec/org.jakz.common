@@ -285,6 +285,12 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		return toReturn;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public HashMap<K,V> getMap()
+	{
+		return (HashMap<K, V>) mapKV.clone();
+	}
+	
 	public IndexedMap<K,V> subList(int fromIndex, int toIndex)
 	{
 		IndexedMap<K,V> toReturn = new IndexedMap<K, V>();

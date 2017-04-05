@@ -2113,4 +2113,9 @@ public class JSONObject extends org.json.JSONObject implements Serializable
 		return toReturn;
 	}
 	*/
+	
+	public String[] getNames()
+	{
+		return getNames(this);
+	}
 }

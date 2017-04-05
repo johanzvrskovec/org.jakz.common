@@ -167,7 +167,6 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public Integer getSizeLimit() {return sizeLimit;}
 	
-	
 	public TypedValue setValueFromSQLResultSet(ResultSet r, String columnLabel) throws SQLException, OperationException
 	{
 		if(type==java.sql.Types.INTEGER)
