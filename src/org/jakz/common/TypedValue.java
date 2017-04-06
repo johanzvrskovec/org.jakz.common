@@ -23,6 +23,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public boolean required,nullable;
 	
+	private static String valueNotNullableExceptionString ="Value is not nullable";
+	
 	private void init()
 	{
 		type=null;
@@ -90,6 +92,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public TypedValue setInteger(Integer nInteger)
 	{
+		if(!nullable&&nInteger==null)
+			throw new NumberFormatException(valueNotNullableExceptionString);
 		init();
 		valueInteger=nInteger;
 		type=java.sql.Types.INTEGER;
@@ -98,6 +102,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public TypedValue setBoolean(Boolean nBoolean)
 	{
+		if(!nullable&&nBoolean==null)
+			throw new NumberFormatException(valueNotNullableExceptionString);
 		init();
 		if(nBoolean!=null)
 		{
@@ -112,6 +118,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public TypedValue setVarchar(String nVarchar)
 	{
+		if(!nullable&&nVarchar==null)
+			throw new NumberFormatException(valueNotNullableExceptionString);
 		init();
 		valueString=nVarchar;
 		type=java.sql.Types.VARCHAR;
@@ -120,6 +128,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public TypedValue setNvarchar(String nNvarchar)
 	{
+		if(!nullable&&nNvarchar==null)
+			throw new NumberFormatException(valueNotNullableExceptionString);
 		init();
 		valueString=nNvarchar;
 		type=java.sql.Types.NVARCHAR;
@@ -128,6 +138,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public TypedValue setTimestamp(Long nTimestamp)
 	{
+		if(!nullable&&nTimestamp==null)
+			throw new NumberFormatException(valueNotNullableExceptionString);
 		init();
 		valueLong=nTimestamp;
 		type=java.sql.Types.TIMESTAMP;
@@ -136,6 +148,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public TypedValue setBigint(Long nBigint)
 	{
+		if(!nullable&&nBigint==null)
+			throw new NumberFormatException(valueNotNullableExceptionString);
 		init();
 		valueLong=nBigint;
 		type=java.sql.Types.BIGINT;
@@ -144,6 +158,8 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public TypedValue setDouble(Double nDouble)
 	{
+		if(!nullable&&nDouble==null)
+			throw new NumberFormatException(valueNotNullableExceptionString);
 		init();
 		valueDouble=nDouble;
 		type=java.sql.Types.DOUBLE;
@@ -153,6 +169,18 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	public TypedValue setSizeLimit(Integer nSizeLimit)
 	{
 		sizeLimit=nSizeLimit;
+		return this;
+	}
+	
+	public TypedValue setRequired(boolean nRequired)
+	{
+		required=nRequired;
+		return this;
+	}
+	
+	public TypedValue setNullable(boolean nNullable)
+	{
+		nullable=nNullable;
 		return this;
 	}
 	
