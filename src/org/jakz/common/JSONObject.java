@@ -281,7 +281,7 @@ public class JSONObject extends org.json.JSONObject implements Serializable
      * <code>"name": "Larry Fine"</code>.
      *
      * @param bean
-     *            A BeanTesta with a wrapped bean. The bean is an object that has getter methods that should be used to make
+     *            CUSTOM: A BeanTesta with a wrapped bean. The bean is an object that has getter methods that should be used to make
      *            a JSONObject.
      */
     public JSONObject(BeanTesta bean) 
@@ -1371,16 +1371,21 @@ public class JSONObject extends org.json.JSONObject implements Serializable
      *            An object which is the value. It should be of one of these
      *            types: Boolean, Double, Integer, JSONArray, JSONObject, Long,
      *            String, or the JSONObject.NULL object.
+     *            CUSTOM: If the value is instance of JSONObjectWriteAspect - converts it to a JSONObject before adding it.
      * @return this.
      * @throws JSONException
      *             If the value is non-finite number or if the key is null.
      */
     public JSONObject put(String key, Object value) throws JSONException {
-        if (key == null) {
+        if (key == null) 
+        {
             throw new NullPointerException("Null key.");
         }
-        if (value != null) {
+        if (value != null) 
+        {
             testValidity(value);
+            if(value instanceof JSONObjectWriteAspect)
+            	value=((JSONObjectWriteAspect) value).toJSONObject();
             this.map.put(key, value);
         } else {
             this.remove(key);

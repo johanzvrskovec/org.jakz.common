@@ -161,23 +161,46 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	
 	public Integer getSizeLimit() {return sizeLimit;}
 	
-	public String getTypeString() 
+	public String getTypeString()
 	{
-		if(type==java.sql.Types.INTEGER)
-			return "INTEGER";
-		else if(type==java.sql.Types.DOUBLE)
-			return "DOUBLE";
-		else if(type==java.sql.Types.BOOLEAN)
-			return "BOOLEAN";
-		else if(type==java.sql.Types.VARCHAR)
-			return "VARCHAR";
-		else if(type==java.sql.Types.NVARCHAR)
-			return "NVARCHAR";
-		else if(type==java.sql.Types.TIMESTAMP)
-			return "TIMESTAMP";
-		else if(type==java.sql.Types.BIGINT)
-			return "BIGINT";
-		
+		return getTypeString(type);
+	}
+	
+	public static String getTypeString(int nType) 
+	{
+		if(nType==java.sql.Types.INTEGER)
+			return "java.sql.Types.INTEGER";
+		else if(nType==java.sql.Types.DOUBLE)
+			return "java.sql.Types.DOUBLE";
+		else if(nType==java.sql.Types.BOOLEAN)
+			return "java.sql.Types.BOOLEAN";
+		else if(nType==java.sql.Types.VARCHAR)
+			return "java.sql.Types.VARCHAR";
+		else if(nType==java.sql.Types.NVARCHAR)
+			return "java.sql.Types.NVARCHAR";
+		else if(nType==java.sql.Types.TIMESTAMP)
+			return "java.sql.Types.TIMESTAMP";
+		else if(nType==java.sql.Types.BIGINT)
+			return "java.sql.Types.BIGINT";
+		else throw new NumberFormatException("The type is unknown");
+	}
+	
+	public static int getTypeValue(String typeStringNonCaseSensitive)
+	{
+		if(typeStringNonCaseSensitive.toLowerCase().equals("java.sql.Types.INTEGER".toLowerCase()))
+			return java.sql.Types.INTEGER;
+		else if(typeStringNonCaseSensitive.toLowerCase().equals("java.sql.Types.DOUBLE".toLowerCase()))
+			return java.sql.Types.DOUBLE;
+		else if(typeStringNonCaseSensitive.toLowerCase().equals("java.sql.Types.BOOLEAN".toLowerCase()))
+			return java.sql.Types.BOOLEAN;
+		else if(typeStringNonCaseSensitive.toLowerCase().equals("java.sql.Types.VARCHAR".toLowerCase()))
+			return java.sql.Types.VARCHAR;
+		else if(typeStringNonCaseSensitive.toLowerCase().equals("java.sql.Types.NVARCHAR".toLowerCase()))
+			return java.sql.Types.NVARCHAR;
+		else if(typeStringNonCaseSensitive.toLowerCase().equals("java.sql.Types.TIMESTAMP".toLowerCase()))
+			return java.sql.Types.TIMESTAMP;
+		else if(typeStringNonCaseSensitive.toLowerCase().equals("java.sql.Types.BIGINT".toLowerCase()))
+			return java.sql.Types.BIGINT;
 		else throw new NumberFormatException("The type is unknown");
 	}
 
@@ -185,7 +208,7 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	public JSONObject toJSONObject() 
 	{
 		JSONObject toreturn = new JSONObject();
-		toreturn.put("type", type);
+		toreturn.put("type", getTypeString());
 		if(type==java.sql.Types.INTEGER)
 			toreturn.put("value", valueInteger);
 		else if(type==java.sql.Types.DOUBLE)
@@ -208,7 +231,7 @@ public class TypedValue implements JSONObjectReadAspect, JSONObjectWriteAspect
 	public void fromJSONObject(JSONObject source) 
 	{
 		init();
-		type=source.getInt("type");
+		type=getTypeValue(source.getString("type"));
 		if(source.has("value"))
 		{
 			if(type==java.sql.Types.INTEGER)
