@@ -1,5 +1,7 @@
 package org.jakz.common.util;
 
+import java.util.List;
+
 public class StringUtil 
 {
 	public static String stringSeparateFixedSpacingLeft(String target, String separator, int spacing)
@@ -34,5 +36,20 @@ public class StringUtil
 		}
 		
 		return result.toString();
+	}
+	
+	public static String appendAll(List<String> s, String separator)
+	{
+		StringBuilder toReturn = new StringBuilder();
+		
+		for(String spart : s)
+		{
+			if(toReturn.length()>0)
+				toReturn.append(separator);
+			
+			toReturn.append(spart);
+		}
+		
+		return toReturn.toString();
 	}
 }

@@ -68,7 +68,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 	
 	public IndexedMap<K,V> put(K nkey, V nvalue, Integer index)
 	{	
-		boolean hasKey = getHasKey(nkey);
+		boolean hasKey = containsKey(nkey);
 		mapKV.put(nkey, nvalue);
 		
 		if(index==null)
@@ -138,11 +138,6 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		return mapKV.entrySet();
 	}
 	 */
-	
-	public boolean getHasKey(K key)
-	{
-		return mapKV.get(key)!=null;
-	}
 
 	public IndexedValue get(K key) 
 	{
