@@ -1,10 +1,41 @@
 package org.jakz.common.util;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class FileUtil 
 {
+	
+	public static void copy(InputStream in, File target) throws IOException
+	{
+		copy(in,target,null,null);
+	}
+	
+	public static void copy(InputStream in, File target, Boolean append) throws IOException
+	{
+		copy(in,target,append,null);
+	}
+	
+	public static void copy(InputStream in,File target,Boolean append,Integer bufferSizeBytes) throws IOException
+	{
+		if(append==null)
+			append=false;
+		if(bufferSizeBytes==null)
+			bufferSizeBytes=100000;
+		
+		byte[] buf = new byte[bufferSizeBytes];
+		FileOutputStream fos = new FileOutputStream(target,append);
+		int readNumBytes = -1;
+		while((readNumBytes = in.read(buf))>=0)
+		{
+			fos.write(buf, 0, readNumBytes);
+		}
+		
+		fos.flush();
+		fos.close();
+	}
 	
 	public static boolean deleteFileIfExistsOldCompatSafe(File f) throws IOException
 	{
