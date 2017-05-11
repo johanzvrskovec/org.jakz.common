@@ -115,7 +115,7 @@ public class FileProcessor
 	 * @param outputDir
 	 * @throws IOException
 	 */
-	public static void unzipFile(File inputFile, File outputDir, boolean overwrite) throws IOException
+	public static void unzipFile(ZipFile inputFile, File outputDir, boolean overwrite) throws IOException
 	{
 		unzipFile(inputFile,outputDir,overwrite,null);
 	}
@@ -127,12 +127,11 @@ public class FileProcessor
 	 * @param zipEntries Will be filled with the processed entries
 	 * @throws IOException
 	 */
-	public static void unzipFile(File inputFile, File outputDir, boolean overwrite, HashMap<String,ZipEntry> zipEntries) throws IOException
+	public static void unzipFile(ZipFile inputFile, File outputDir, boolean overwrite, HashMap<String,ZipEntry> zipEntries) throws IOException
 	{
-		ZipFile zipFile = new ZipFile(inputFile);
 		try 
 		{
-		  Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		  Enumeration<? extends ZipEntry> entries = inputFile.entries();
 		  while (entries.hasMoreElements()) 
 		  {
 		    ZipEntry entry = entries.nextElement();
@@ -147,7 +146,7 @@ public class FileProcessor
 		    	if(entryDestination.exists()&&!overwrite)
 		    		throw new IOException("File "+entry.getName()+" exists already in the target location.");
 		        entryDestination.getParentFile().mkdirs();
-		        InputStream in = zipFile.getInputStream(entry);
+		        InputStream in = inputFile.getInputStream(entry);
 		        OutputStream out = new FileOutputStream(entryDestination);
 		        
 		        byte[] bytesIn = new byte[BUFFER_SIZE];
@@ -163,7 +162,7 @@ public class FileProcessor
 		} 
 		finally 
 		{
-		  zipFile.close();
+			inputFile.close();
 		}
 	}
 	

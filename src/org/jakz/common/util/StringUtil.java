@@ -1,6 +1,8 @@
 package org.jakz.common.util;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringUtil 
 {
@@ -51,5 +53,18 @@ public class StringUtil
 		}
 		
 		return toReturn.toString();
+	}
+	
+	public static String matchAndCatch(String input, String regex)
+	{
+		Pattern pat = Pattern.compile(regex);
+		Matcher m = pat.matcher(input);
+		
+		if(m.find())
+		{
+			return m.group();
+		}
+		
+		return null;
 	}
 }
