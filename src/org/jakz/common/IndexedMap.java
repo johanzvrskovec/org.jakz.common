@@ -10,6 +10,13 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+/**
+ * Key-value map with the elements indexed in a list. Elements are appended to the end of the list if not otherwise specified, but can also be inserted at specified index positions where they then replace the existing element at that position. 
+ * @author johkal
+ *
+ * @param <K> Key type
+ * @param <V> Value type
+ */
 public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAspect, Iterable<V> //implements Map<K, V>
 {
 	public class IndexedValue
@@ -61,15 +68,86 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		return put(nkey, nvalue.value, nvalue.index);
 	}
 	
-	public IndexedMap<K,V> put(KeyedValue nKeyedValue, int index)
+	public IndexedMap<K,V> put(KeyedValue nKeyedValue, Integer index)
 	{
 		return put(nKeyedValue.key,nKeyedValue.value,index);
 	}
 	
 	public IndexedMap<K,V> put(K nkey, V nvalue, Integer index)
+	{
+		return putOpt(nkey,nvalue,index,false,false);
+	}
+	
+	public IndexedMap<K,V> optk(K nkey, V nvalue)
+	{
+		return optk(nkey,nvalue,null);
+	}
+	
+	public IndexedMap<K,V> optk(KeyedValue nKeyedValue)
+	{
+		return optk(nKeyedValue.key,nKeyedValue.value,null);
+	}
+	
+	public IndexedMap<K,V> optk(K nkey, IndexedValue nvalue)
+	{
+		return optk(nkey, nvalue.value, nvalue.index);
+	}
+	
+	public IndexedMap<K,V> optk(KeyedValue nKeyedValue, Integer index)
+	{
+		return optk(nKeyedValue.key,nKeyedValue.value,index);
+	}
+	
+	public IndexedMap<K,V> optk(K nkey, V nvalue, Integer index)
+	{
+		return putOpt(nkey,nvalue,index,true,false);
+	}
+	
+	public IndexedMap<K,V> opti(K nkey, IndexedValue nvalue)
+	{
+		return opti(nkey, nvalue.value, nvalue.index);
+	}
+	
+	public IndexedMap<K,V> opti(KeyedValue nKeyedValue, Integer index)
+	{
+		return opti(nKeyedValue.key,nKeyedValue.value,index);
+	}
+	
+	public IndexedMap<K,V> opti(K nkey, V nvalue, Integer index)
+	{
+		return putOpt(nkey,nvalue,index,false,true);
+	}
+	
+	public IndexedMap<K,V> opt(K nkey, V nvalue)
+	{
+		return opt(nkey,nvalue,null);
+	}
+	
+	public IndexedMap<K,V> opt(KeyedValue nKeyedValue)
+	{
+		return opt(nKeyedValue.key,nKeyedValue.value,null);
+	}
+	
+	public IndexedMap<K,V> opt(K nkey, IndexedValue nvalue)
+	{
+		return opt(nkey, nvalue.value, nvalue.index);
+	}
+	
+	public IndexedMap<K,V> opt(KeyedValue nKeyedValue, Integer index)
+	{
+		return opt(nKeyedValue.key,nKeyedValue.value,index);
+	}
+	
+	public IndexedMap<K,V> opt(K nkey, V nvalue, Integer index)
+	{
+		return putOpt(nkey,nvalue,index,true,true);
+	}
+	
+	public IndexedMap<K,V> putOpt(K nkey, V nvalue, Integer index, boolean optKey, boolean optIndex)
 	{	
 		boolean hasKey = containsKey(nkey);
-		mapKV.put(nkey, nvalue);
+		if(hasKey&&optKey)
+			return this;
 		
 		if(index==null)
 		{
@@ -88,6 +166,9 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 				int iToRemove = mapKI.get(nkey);
 				if(iToRemove!=index)
 				{
+					if(optIndex)
+						return this;
+					
 					listK.remove(iToRemove);
 					listK.add(index, nkey);
 				}
@@ -96,6 +177,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 				listK.add(index, nkey);
 		}
 		
+		mapKV.put(nkey, nvalue);
 		mapKI.put(nkey, index);
 		
 		return this;
@@ -281,7 +363,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 	}
 	
 	@SuppressWarnings("unchecked")
-	public HashMap<K,V> getMap()
+	public HashMap<K,V> map()
 	{
 		return (HashMap<K, V>) mapKV.clone();
 	}
@@ -305,6 +387,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		return subList(fromIndex, listK.size());
 	}
 	
+	@Override
 	public JSONObject toJSONObject()
 	{
 		JSONObject toReturn = new JSONObject();
@@ -334,6 +417,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Override
 	public void fromJSONObject(JSONObject json)
 	{
 		clear();
@@ -362,7 +446,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		}
 	}
 	
-	
+	@Override
 	public String toString()
 	{
 		return toJSONObject().toString();
