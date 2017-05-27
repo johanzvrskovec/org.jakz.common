@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * Key-value map with the elements indexed in a list. Elements are appended to the end of the list if not otherwise specified, but can also be inserted at specified index positions where they then replace the existing element at that position. 
+ * Key-value map with the elements indexed in a list. Elements are appended to the end of the list if not otherwise specified, but can also be inserted at specified index positions where they then shift the existing elements to the right from that position. 
  * @author johkal
  *
  * @param <K> Key type
@@ -30,6 +30,11 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		}
 	}
 	
+	public IndexedValue createIndexedValue(Integer nindex,V nvalue)
+	{
+		return new IndexedValue(nindex,nvalue);
+	}
+	
 	public class KeyedValue
 	{
 		public final K key;
@@ -39,6 +44,11 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		{
 			key=nKey; value=nValue;
 		}
+	}
+	
+	public KeyedValue createKeyedValue(K nkey,V nvalue)
+	{
+		return new KeyedValue(nkey,nvalue);
 	}
 	
 	private HashMap<K,V> mapKV;
@@ -158,29 +168,61 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 				listK.add(nkey);
 				index=listK.size()-1;
 			}
+			
+			mapKI.put(nkey, index);
 		}
 		else
 		{
+			if(index<listK.size()&&getValueAt(index)!=null&&optIndex)
+				return this;
+			
+			int existingIndex = index;
 			if(hasKey)
 			{
-				int iToRemove = mapKI.get(nkey);
-				if(iToRemove!=index)
-				{
-					if(optIndex)
-						return this;
-					
-					listK.remove(iToRemove);
-					listK.add(index, nkey);
-				}
+				existingIndex = mapKI.get(nkey);
+				listK.remove(existingIndex);
+				listK.add(index, nkey);
 			}
 			else
 				listK.add(index, nkey);
+			
+			
+			//update indices
+			if(hasKey)
+				updateIndicesMove(existingIndex, index);
+			else
+				updateIndicesInsertRemove(index);
 		}
 		
 		mapKV.put(nkey, nvalue);
-		mapKI.put(nkey, index);
+		
 		
 		return this;
+	}
+	
+	protected void updateIndicesMove(int sourceIndex, int targetIndex)
+	{
+		int low = sourceIndex;
+		int high = targetIndex;
+		if(targetIndex<low)
+		{
+			low=targetIndex;
+			high=sourceIndex;
+		}
+		
+		for(int i=low; i<high; i++)
+		{
+			mapKI.put(listK.get(i), i);
+		}
+	}
+	
+	protected void updateIndicesInsertRemove(int sourceIndex)
+	{
+		
+		for(int i=sourceIndex; i<listK.size(); i++)
+		{
+			mapKI.put(listK.get(i), i);
+		}
 	}
 
 
@@ -295,6 +337,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		listK.remove(mapKI.get(key));
 		Integer retI = mapKI.remove(key);
 		V retV = mapKV.remove(key);
+		updateIndicesInsertRemove(retI);
 		return new IndexedValue(retI,retV);
 	}
 	
@@ -304,6 +347,7 @@ public class IndexedMap<K,V> implements JSONObjectReadAspect, JSONObjectWriteAsp
 		listK.remove(index);
 		mapKI.remove(key);
 		V retV = mapKV.remove(key);
+		updateIndicesInsertRemove(index);
 		return new KeyedValue(key,retV);
 	}
 
