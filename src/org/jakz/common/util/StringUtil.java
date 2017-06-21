@@ -67,4 +67,31 @@ public class StringUtil
 		
 		return null;
 	}
+	
+	public static String substringInc(String input,String beginStrIndexOf,String endStrIndexOf)
+	{
+		if(endStrIndexOf!=null)
+			return input.substring(input.indexOf(beginStrIndexOf),input.indexOf(endStrIndexOf));
+		else
+			return input.substring(input.indexOf(beginStrIndexOf));
+	}
+	
+	public static String substringInc(String input, String beginStrIndexOf)
+	{
+		return substringInc(input,beginStrIndexOf,null);
+	}
+	
+	public static String lastSubstringInc(String input,String beginStrIndexOf,String endStrIndexOf)
+	{
+		if(endStrIndexOf!=null)
+			return input.substring(input.lastIndexOf(beginStrIndexOf),input.lastIndexOf(endStrIndexOf));
+		else
+			return input.substring(input.lastIndexOf(beginStrIndexOf));
+	}
+	
+	public static String lastSubstringInc(String input, String beginStrIndexOf)
+	{
+		return lastSubstringInc(input,beginStrIndexOf,null);
+	}
+	
 }
