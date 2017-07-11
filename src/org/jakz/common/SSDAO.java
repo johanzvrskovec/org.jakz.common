@@ -12,29 +12,33 @@ public class SSDAO extends DAO
 		connect(connectionUrl,true); //autocommit false does not work
 	}
 	
+	/**
+	 * Start a transaction by setting auto commit to false in SQL Server
+	 */
 	@Override
 	public void startTransaction() throws SQLException
 	{
-		Statement q = c.createStatement();
-		q.execute("BEGIN TRANSACTION");
-		q.close();
+		c.setAutoCommit(false);
 	}
 	
-	
+	/**
+	 * Commits a transaction by using the jdbc commit() method. Also resets SQL Server auto commit to true.
+	 */
 	@Override
 	public void commit() throws SQLException
 	{
-		Statement q = c.createStatement();
-		q.execute("COMMIT");
-		q.close();	
+		c.commit();
+		c.setAutoCommit(true);
 	}
 	
+	/**
+	 * Rollbacks the transaction by using the jdbc rollback() method. Also resets SQL server auto commit to true.
+	 */
 	@Override
 	public void rollback() throws SQLException
 	{
-		Statement q = c.createStatement();
-		q.execute("ROLLBACK");
-		q.close();
+		c.rollback();
+		c.setAutoCommit(true);
 	}
 	
 }
