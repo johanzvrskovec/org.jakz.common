@@ -94,4 +94,15 @@ public class StringUtil
 		return lastSubstringInc(input,beginStrIndexOf,null);
 	}
 	
+	public static String substringMax(String input, int beginIndex,int maxEndIndex)
+	{
+		int endIndex = NumUtil.numMinInteger(maxEndIndex, input.length());
+		return input.substring(beginIndex, endIndex);
+	}
+	
+	public static String substringMax(String input, int maxEndIndex)
+	{
+		return substringMax(input,0,maxEndIndex);
+	}
+	
 }

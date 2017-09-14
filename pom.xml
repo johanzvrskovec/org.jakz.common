@@ -12,7 +12,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.5.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -66,8 +66,13 @@
 	  		<artifactId>bcpg-jdk16</artifactId>
 	  		<version>1.46</version>
 	  	</dependency>
+	  	<dependency>
+	  		<groupId>org.jsoup</groupId>
+	  		<artifactId>jsoup</artifactId>
+	  		<version>1.10.3</version>
+	  	</dependency>
   </dependencies>
-  <version>2.5.0</version>
+  <version>2.6.0</version>
   <organization>
   	<name>jakz</name>
   </organization>
