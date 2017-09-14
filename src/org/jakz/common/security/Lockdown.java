@@ -2,8 +2,8 @@ package org.jakz.common.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,9 +14,13 @@ import java.util.Set;
  */
 public class Lockdown
 {
+	public byte[] authRandBytes;
+	public String authRandB64String;
+	
 	
 	private Base64.Encoder b64encoder;
 	private MessageDigest md;
+	private SecureRandom randGen;
 	
 	private String curentUsername;
 	private boolean authenticated = false;
@@ -25,31 +29,59 @@ public class Lockdown
 	
 	public Lockdown() throws NoSuchAlgorithmException
 	{
+		
+		final byte[] dummy = new byte[9];
+		try
+		{
+			randGen = SecureRandom.getInstance("SHA1PRNG");
+		} catch (NoSuchAlgorithmException e)
+		{
+			randGen = new SecureRandom();
+		}
+		randGen.nextBytes(dummy);
 		b64encoder=Base64.getEncoder();
 		md = MessageDigest.getInstance("SHA-512");
 		roles = new HashSet<String>();
+		regenerateAuthRand();
 	}
 	
+	public void regenerateAuthRand()
+	{
+		authRandBytes = new byte[1024];
+		randGen.nextBytes(authRandBytes);
+		authRandB64String = b64encoder.encodeToString(authRandBytes);
+	}
+	
+	/**
+	 * Use this to generate hashed secrets that can be stored per user, instead of stored plain passwords. Or use another hashing scheme.
+	 * @param userRealUsername
+	 * @param userRealPassword
+	 * @return
+	 */
 	public String generateUserHashedSecretB64String(String userRealUsername, String userRealPassword)
 	{
 		return b64encoder.encodeToString(md.digest((userRealPassword+userRealUsername+userRealPassword).getBytes()));
 	}
 	
 	/**
-	 * Authenticate using the object message digest.
+	 * Authenticate using the object message digest. Also regenerates the internal random number.
 	 * @param usernameString
 	 * @param authenticationB64String
-	 * @param randomB64String
+	 * @param userSecret Can be either a straight-forward password, or even better, a hashed secret
 	 */
-	public void authenticate(String usernameString, String authenticationB64String, String randomB64String, String userHashedSecretB64String)
+	public void authenticate(String usernameString, String authenticationB64String, String userSecret)
 	{
+		if(authRandB64String==null)
+			throw new IllegalArgumentException("The internal authRandB64String can not be null for this to work.");
 		curentUsername=usernameString;
 		authenticated = false;
 		
-		String calculatedCorrectAuthenticationString = b64encoder.encodeToString(md.digest((randomB64String+curentUsername+userHashedSecretB64String+randomB64String).getBytes()));
+		String calculatedCorrectAuthenticationString = b64encoder.encodeToString(md.digest((authRandB64String+curentUsername+userSecret+authRandB64String).getBytes()));
 		authenticated = calculatedCorrectAuthenticationString!=null
 				&&calculatedCorrectAuthenticationString.length()>0
 				&&calculatedCorrectAuthenticationString.equals(authenticationB64String);
+				
+		regenerateAuthRand();
 	}
 	
 	public boolean isAuthenticated()
@@ -80,5 +112,9 @@ public class Lockdown
 	{
 		return isAuthenticated()&&roles.contains(role);
 	}
+	
+	public SecureRandom getRandomGenerator() {return randGen;}
+	
+	public String getCurrentUsername() {return curentUsername;}
 	
 }
