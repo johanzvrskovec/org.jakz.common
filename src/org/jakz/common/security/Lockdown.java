@@ -89,6 +89,11 @@ public class Lockdown
 		return authenticated;
 	}
 	
+	public void setAuthenticated(boolean nAuthenticated)
+	{
+		authenticated=nAuthenticated;
+	}
+	
 	/**
 	 * Adds role.
 	 * @param nRole
