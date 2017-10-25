@@ -105,4 +105,12 @@ public class StringUtil
 		return substringMax(input,0,maxEndIndex);
 	}
 	
+	public static String optToString(Object toStringObject)
+	{
+		if(toStringObject==null)
+			return "";
+		else
+			return toStringObject.toString();
+	}
+	
 }
