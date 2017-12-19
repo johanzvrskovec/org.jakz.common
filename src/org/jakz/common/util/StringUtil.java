@@ -113,4 +113,21 @@ public class StringUtil
 			return toStringObject.toString();
 	}
 	
+	public static String iterableToSeparatedString(Object[] toIterate, String separator)
+	{
+		if(separator==null)
+			separator=",";
+		StringBuilder result = new StringBuilder();
+		
+		for(Object c : toIterate)
+		{
+			if(result.length()>0)
+				result.append(separator);
+			result.append(""+c);
+		}
+		
+		return result.toString();
+		
+	}
+	
 }
