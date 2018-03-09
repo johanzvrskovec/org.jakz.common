@@ -130,4 +130,24 @@ public class StringUtil
 		
 	}
 	
+	public static String padLeftToLength(String source, String padding, int targetLength)
+	{
+		StringBuilder product = new StringBuilder("");
+		while(product.length()+source.length()<targetLength)
+		{
+			product.append(padding);
+		}
+		return product.toString()+source;
+	}
+	
+	public static String padRightToLength(String source, String padding, int targetLength)
+	{
+		StringBuilder product = new StringBuilder("");
+		while(product.length()+source.length()<targetLength)
+		{
+			product.append(padding);
+		}
+		return source+product.toString();
+	}
+	
 }
