@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * Key-value map with the elements indexed in a list. Elements are appended to the end of the list if not otherwise specified, but can also be inserted at specified index positions where they then shift the existing elements to the right from that position. 
+ * Key-value map with the elements indexed in a list. Elements are appended to the end of the list if not otherwise specified, but can also be inserted at specified index positions where they then shift the existing elements to the right from that position. This class is not thread safe.
  * @author johkal
  *
  * @param <K> Key type

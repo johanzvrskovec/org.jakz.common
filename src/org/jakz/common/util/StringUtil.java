@@ -1,11 +1,44 @@
 package org.jakz.common.util;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil 
 {
+	
+	public static String URLParametersFromMap(Map<String,String> parameterMap)
+	{
+		
+		StringBuilder work = new StringBuilder();
+		String resultString;
+		if(!parameterMap.isEmpty())
+		{
+			Set<Entry<String,String>> entrySet = parameterMap.entrySet();
+			
+			boolean first =true;
+			for(Entry<String,String> entry : entrySet)
+			{
+				if(first)
+					first=false;
+				else
+					work.append("&");
+				
+				work.append(entry.getKey()+"="+entry.getValue());
+			}
+			
+		}
+		
+		resultString=work.toString();
+		
+		if(resultString.length()>0)
+			resultString="?"+resultString;
+		return resultString;
+	}
+	
 	public static String stringSeparateFixedSpacingLeft(String target, String separator, int spacing)
 	{
 		StringBuilder result = new StringBuilder();
