@@ -541,6 +541,7 @@ public class CustomFormatter
 						//Keeps possibility to have cells with blankspace characters
 							currentCell.length()>0&&iCell<fileColumns.size() //is data cell
 							&&!(currentCell.contains(".")&&currentCell.length()==1) //special null encoding
+							&&!(currentCell.trim().toUpperCase().contains("NA")&&currentCell.trim().length()==2) //other special null encoding
 						)
 				{
 					short typeToPut = -1;
@@ -657,6 +658,7 @@ public class CustomFormatter
 				
 				if(currentCell.length()>0
 						&&!(currentCell.contains(".")&&currentCell.length()==1)  //special null encoding
+						&&!(currentCell.trim().toUpperCase().contains("NA")&&currentCell.trim().length()==2) //other special null encoding
 						)
 				{
 					String name = fileColumns.get(iCell);
