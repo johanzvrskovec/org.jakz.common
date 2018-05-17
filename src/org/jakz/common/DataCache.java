@@ -11,7 +11,7 @@ import java.util.HashSet;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.server.TcpServer;
 import org.h2.tools.Server;
