@@ -71,6 +71,12 @@
 	  		<artifactId>commons-lang3</artifactId>
 	  		<version>3.7</version>
 	  	</dependency>
+	  	<!-- DEPRECATED -->
+	  	<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.6</version>
+		</dependency>
   </dependencies>
   <version>2.6.0</version>
   <organization>
