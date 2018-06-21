@@ -183,4 +183,14 @@ public class StringUtil
 		return source+product.toString();
 	}
 	
+	public static String cleanFileNameLossy(String toClean)
+	{
+		return toClean.replaceAll("[^a-zA-Z0-9_\\.\\-]", "");
+	}
+	
+	public static String cleanFileNameLossyTimeString(String toCleanTimeString)
+	{
+		return cleanFileNameLossy(toCleanTimeString.replaceAll("[\\.]", "_").replaceAll("[\\-]", ""));
+	}
+	
 }
