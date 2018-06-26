@@ -80,7 +80,7 @@ public class FileUtil
 			copyAttributes(source,target);
 	}
 	
-	public static void move(File source,File target,boolean copyAttributes) throws IOException
+	public static boolean move(File source,File target,boolean copyAttributes, int timeoutMillisWaitForDelete) throws IOException
 	{
 		//if(copyAttributes)
 		//{
@@ -94,15 +94,34 @@ public class FileUtil
 			//target.setExecutable(canExecute);
 			//target.setReadable(canRead);
 			//target.setWritable(canWrite);
-			source.delete();
+			boolean deleteResult = source.delete();
+			int sumWait = 0;
+			int waitTimeMillis=0;
+			for(int i=0; !deleteResult&&timeoutMillisWaitForDelete>=0&&sumWait+waitTimeMillis<=timeoutMillisWaitForDelete; i++)
+			{
+				try
+				{
+					Thread.sleep(waitTimeMillis);
+				} catch (InterruptedException e)
+				{
+					//nothing
+				}
+				
+				sumWait+=waitTimeMillis;
+				waitTimeMillis=NumUtil.numMinInteger(Math.abs(waitTimeMillis+i), 2000);
+				
+				deleteResult = source.delete();
+			}
+			
+			return deleteResult;
 		//}
 		//else
 			//Files.move(source.toPath(), target.toPath());
 	}
 	
-	public static void move(File source,File target) throws IOException
+	public static boolean move(File source,File target) throws IOException
 	{
-		move(source,target,true);
+		return move(source,target,true,-1);
 	}
 	
 	
