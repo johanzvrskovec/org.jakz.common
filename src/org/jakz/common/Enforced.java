@@ -20,6 +20,12 @@ public class Enforced<T>
 	//String etc
 	private Integer enfMaxLength;
 	
+	//Numerical
+	private Long enfMaxNumValInt;
+	private Double enfMaxNumValFloat;
+	private Long enfMinNumValInt;
+	private Double enfMinNumValFloat;
+	
 	public Enforced(T value)
 	{
 		this.value=value;
@@ -62,11 +68,6 @@ public class Enforced<T>
 		return maxLength;
 	}
 	
-	
-	/**
-	 * Unclear if working
-	 * @return
-	 */
 	private boolean enforceMaxLength() throws UnsupportedOperationException
 	{
 		if(value==null)
@@ -99,6 +100,60 @@ public class Enforced<T>
 		throw new UnsupportedOperationException("The datatype does not support this restriction.");
 	}
 	
+	private boolean enforceMaxValue()
+	{
+		if(value==null)
+			return true;
+		
+		if(value instanceof Number)
+		{
+			if(enfMaxNumValInt!=null)
+			{
+				if(((Long)value)<=enfMaxNumValInt)
+					return true;
+				else
+					return false;
+			}
+			else if(enfMaxNumValFloat!=null)
+			{
+				if(((Double)value)<=enfMaxNumValFloat)
+					return true;
+				else
+					return false;
+			}
+				
+		}
+		
+		throw new UnsupportedOperationException("The datatype does not support this restriction.");
+	}
+	
+	private boolean enforceMinValue()
+	{
+		if(value==null)
+			return true;
+		
+		if(value instanceof Number)
+		{
+			if(enfMinNumValInt!=null)
+			{
+				if(((Long)value)>=enfMinNumValInt)
+					return true;
+				else
+					return false;
+			}
+			else if(enfMinNumValFloat!=null)
+			{
+				if(((Double)value)>=enfMinNumValFloat)
+					return true;
+				else
+					return false;
+			}
+				
+		}
+		
+		throw new UnsupportedOperationException("The datatype does not support this restriction.");
+	}
+	
 	public Enforced<T> maxLength(Integer enfLength)
 	{
 		this.enfMaxLength=enfLength;
@@ -109,7 +164,40 @@ public class Enforced<T>
 		return this;
 	}
 	
+	public Enforced<T> maxNumVal(Long enfMaxNumVal)
+	{
+		this.enfMaxNumValInt =enfMaxNumVal;
+		
+		possiblyThrowErrorOnFailedEnforcementResult("max value", enforceMaxValue());
+			
+		return this;
+	}
 	 
+	public Enforced<T> maxNumVal(Double enfMaxNumVal)
+	{
+		this.enfMaxNumValFloat =enfMaxNumVal;
+		
+		possiblyThrowErrorOnFailedEnforcementResult("max value", enforceMaxValue());
+			
+		return this;
+	}
 	
+	public Enforced<T> minNumVal(Long enfMinNumVal)
+	{
+		this.enfMinNumValInt =enfMinNumVal;
+		
+		possiblyThrowErrorOnFailedEnforcementResult("min value", enforceMinValue());
+			
+		return this;
+	}
+	 
+	public Enforced<T> minNumVal(Double enfMinNumVal)
+	{
+		this.enfMinNumValFloat =enfMinNumVal;
+		
+		possiblyThrowErrorOnFailedEnforcementResult("min value", enforceMinValue());
+			
+		return this;
+	}
 	
 }
