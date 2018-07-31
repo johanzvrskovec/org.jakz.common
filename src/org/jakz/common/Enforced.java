@@ -154,6 +154,14 @@ public class Enforced<T>
 		throw new UnsupportedOperationException("The datatype does not support this restriction.");
 	}
 	
+	private boolean enforceNotNullValue()
+	{
+		if(enfNotNull&&value==null)
+			return false;
+		else
+			return true;	
+	}
+	
 	public Enforced<T> maxLength(Integer enfLength)
 	{
 		this.enfMaxLength=enfLength;
@@ -198,6 +206,20 @@ public class Enforced<T>
 		possiblyThrowErrorOnFailedEnforcementResult("min value", enforceMinValue());
 			
 		return this;
+	}
+	
+	public Enforced<T> notNull(boolean notNull)
+	{
+		this.enfNotNull=notNull;
+		
+		possiblyThrowErrorOnFailedEnforcementResult("not null value", enforceNotNullValue());
+			
+		return this;
+	}
+	
+	public Enforced<T> notNull()
+	{
+		return notNull(true);
 	}
 	
 }
