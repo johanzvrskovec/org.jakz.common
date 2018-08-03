@@ -14,6 +14,9 @@ import java.util.Arrays;
 
 import org.apache.ibatis.javassist.bytecode.ByteArray;
 
+/**
+ * Utility to deal with the old File-class. Recommended to use Path instead for > Java 7 
+ */
 public class FileUtil 
 {
 	

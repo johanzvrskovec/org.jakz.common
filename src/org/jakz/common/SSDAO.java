@@ -9,7 +9,7 @@ public class SSDAO extends DAO
 	public SSDAO(String connectionUrl) throws ClassNotFoundException, SQLException
 	{
 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-		connect(connectionUrl,true); //autocommit false does not work
+		connect(connectionUrl,true); //auto commit false does not work
 	}
 	
 	/**
@@ -32,12 +32,21 @@ public class SSDAO extends DAO
 	}
 	
 	/**
+	 * Commits a transaction by using the jdbc commit() method. Does not reset SQL Server auto commit to true; continues with new transaction.
+	 */
+	public void commitAndStartTransactionn() throws SQLException
+	{
+		c.commit();
+	}
+	
+	/**
 	 * Rollbacks the transaction by using the jdbc rollback() method. Also resets SQL server auto commit to true.
 	 */
 	@Override
 	public void rollback() throws SQLException
 	{
-		c.rollback();
+		if(!c.getAutoCommit())
+			c.rollback();
 		c.setAutoCommit(true);
 	}
 	

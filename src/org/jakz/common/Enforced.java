@@ -38,10 +38,9 @@ public class Enforced<T>
 		return this;
 	}
 	
-	public T get()
-	{
-		return value;
-	}
+	public T get() {return value;}
+	
+	public String toString() {return get().toString();}
 	
 	public Enforced<T> setExceptionOnFail(boolean settingExceptionOnFail)
 	{
@@ -109,14 +108,14 @@ public class Enforced<T>
 		{
 			if(enfMaxNumValInt!=null)
 			{
-				if(((Long)value)<=enfMaxNumValInt)
+				if(((Number) value).longValue()<=enfMaxNumValInt)
 					return true;
 				else
 					return false;
 			}
 			else if(enfMaxNumValFloat!=null)
 			{
-				if(((Double)value)<=enfMaxNumValFloat)
+				if(((Number) value).doubleValue()<=enfMaxNumValFloat)
 					return true;
 				else
 					return false;
@@ -136,14 +135,14 @@ public class Enforced<T>
 		{
 			if(enfMinNumValInt!=null)
 			{
-				if(((Long)value)>=enfMinNumValInt)
+				if(((Number) value).longValue()>=enfMinNumValInt)
 					return true;
 				else
 					return false;
 			}
 			else if(enfMinNumValFloat!=null)
 			{
-				if(((Double)value)>=enfMinNumValFloat)
+				if(((Number) value).doubleValue()>=enfMinNumValFloat)
 					return true;
 				else
 					return false;
@@ -180,6 +179,15 @@ public class Enforced<T>
 			
 		return this;
 	}
+	
+	public Enforced<T> maxNumVal(Integer enfMaxNumVal)
+	{
+		this.enfMaxNumValInt = enfMaxNumVal.longValue();
+		
+		possiblyThrowErrorOnFailedEnforcementResult("max value", enforceMaxValue());
+			
+		return this;
+	}
 	 
 	public Enforced<T> maxNumVal(Double enfMaxNumVal)
 	{
@@ -193,6 +201,15 @@ public class Enforced<T>
 	public Enforced<T> minNumVal(Long enfMinNumVal)
 	{
 		this.enfMinNumValInt =enfMinNumVal;
+		
+		possiblyThrowErrorOnFailedEnforcementResult("min value", enforceMinValue());
+			
+		return this;
+	}
+	
+	public Enforced<T> minNumVal(Integer enfMinNumVal)
+	{
+		this.enfMinNumValInt =enfMinNumVal.longValue();
 		
 		possiblyThrowErrorOnFailedEnforcementResult("min value", enforceMinValue());
 			
