@@ -7,20 +7,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.zip.ZipEntry;
 
 import org.apache.ibatis.javassist.bytecode.ByteArray;
 
 /**
- * Utility to deal with the old File-class. Recommended to use Path instead for > Java 7 
+ * Utility to deal with file related stuff, and the old File-class. Recommended to use Path instead for > Java 7 
  */
 public class FileUtil 
 {
 	
-	private final static int DEFAULT_BUFFER_SIZE_BYTES = 10000000;
+	public final static int DEFAULT_BUFFER_SIZE_BYTES = 0x1000000;
 	
 	public static void copyAttributes(File source,File target)
 	{
@@ -46,14 +48,8 @@ public class FileUtil
 		if(bufferSizeBytes==null)
 			bufferSizeBytes=DEFAULT_BUFFER_SIZE_BYTES;
 		
-		byte[] buf = new byte[bufferSizeBytes];
 		FileOutputStream fos = new FileOutputStream(target,append);
-		int readNumBytes = -1;
-		while((readNumBytes = in.read(buf))>=0)
-		{
-			fos.write(buf, 0, readNumBytes);
-		}
-		
+		StreamUtil.pipeAll(in, fos, bufferSizeBytes);
 		fos.flush();
 		fos.close();
 	}
@@ -275,6 +271,23 @@ public class FileUtil
 	public static boolean compareFileChecksumSHA512(File a, File b) throws NoSuchAlgorithmException, IOException
 	{
 		return compareFileChecksumSHA512(a, b, DEFAULT_BUFFER_SIZE_BYTES);
+	}
+	
+	public static ZipEntry zipCopyMetaFrom(ZipEntry source, ZipEntry target)
+	{
+		target.setComment(source.getComment());
+		target.setTime(source.getTime());
+		FileTime ftime;
+		ftime = source.getCreationTime();
+		if(ftime!=null)
+			target.setCreationTime(ftime);
+		ftime = source.getLastAccessTime();
+		if(ftime!=null)
+			target.setLastAccessTime(ftime);
+		ftime = source.getLastModifiedTime();
+		if(ftime!=null)
+			target.setLastModifiedTime(ftime);
+		return target;
 	}
 	
 }

@@ -101,6 +101,56 @@ public class StringUtil
 		return null;
 	}
 	
+	
+	public static String substring(String input, String beginStrIndexOf, String endStrIndexOf, boolean lastOccurence, boolean includeDelimeters, boolean conditionalDelimeters)
+	{
+		int beginStrIndex;
+		
+		if(lastOccurence)
+			beginStrIndex = input.lastIndexOf(beginStrIndexOf);
+		else
+			beginStrIndex = input.indexOf(beginStrIndexOf);
+		
+		if(beginStrIndex<0)
+		{
+			if(conditionalDelimeters)
+				beginStrIndex=0;
+			else 
+				throw new IllegalArgumentException("beginStrIndexOf delimeter does not exist in the input string.");
+		}
+		
+		int endStrIndexSearchStart = beginStrIndex+beginStrIndexOf.length();
+		
+		if(!includeDelimeters&&beginStrIndex>-1)
+			beginStrIndex+=beginStrIndexOf.length();
+		if(endStrIndexOf==null)
+			return input.substring(beginStrIndex);
+		else
+		{
+			int endStrIndex = input.indexOf(endStrIndexOf,endStrIndexSearchStart);
+			if(includeDelimeters&&endStrIndex>-1)
+				endStrIndex+=endStrIndexOf.length();
+			
+			if(endStrIndex<0)
+			{
+				if(conditionalDelimeters)
+					return input.substring(beginStrIndex);
+				else 
+					throw new IllegalArgumentException("endStrIndexOf delimeter does not exist in the input string.");
+			}
+			
+			return input.substring(beginStrIndex,endStrIndex);
+		}
+	}
+	
+	@Deprecated
+	/**
+	 * Do these do the right thing?
+	 * @param input
+	 * @param beginStrIndexOf
+	 * @param endStrIndexOf
+	 * @return
+	 */
 	public static String substringInc(String input,String beginStrIndexOf,String endStrIndexOf)
 	{
 		if(endStrIndexOf!=null)
@@ -109,11 +159,26 @@ public class StringUtil
 			return input.substring(input.indexOf(beginStrIndexOf));
 	}
 	
+	@Deprecated
+	/**
+	 * Do these do the right thing?
+	 * @param input
+	 * @param beginStrIndexOf
+	 * @return
+	 */
 	public static String substringInc(String input, String beginStrIndexOf)
 	{
 		return substringInc(input,beginStrIndexOf,null);
 	}
 	
+	@Deprecated
+	/**
+	 * Do these do the right thing?
+	 * @param input
+	 * @param beginStrIndexOf
+	 * @param endStrIndexOf
+	 * @return
+	 */
 	public static String lastSubstringInc(String input,String beginStrIndexOf,String endStrIndexOf)
 	{
 		if(endStrIndexOf!=null)
@@ -122,6 +187,13 @@ public class StringUtil
 			return input.substring(input.lastIndexOf(beginStrIndexOf));
 	}
 	
+	@Deprecated
+	/**
+	 * Do these do the right thing?
+	 * @param input
+	 * @param beginStrIndexOf
+	 * @return
+	 */
 	public static String lastSubstringInc(String input, String beginStrIndexOf)
 	{
 		return lastSubstringInc(input,beginStrIndexOf,null);

@@ -7,6 +7,8 @@ import java.io.OutputStream;
 
 public class StreamUtil
 {
+	public final static int DEFAULT_BUFFER_SIZE_BYTES = 0x4000;
+	
 	/**
 	 * Read all bytes for < Java 9
 	 * @param is
@@ -35,7 +37,7 @@ public class StreamUtil
 	 */
 	public static byte[] readAllBytes(InputStream is) throws IOException
 	{
-		return readAllBytes(is, 0x4000);
+		return readAllBytes(is, DEFAULT_BUFFER_SIZE_BYTES);
 	}
 	
 	public static void pipeAll(InputStream is, OutputStream os, int estSizeBytes) throws IOException
@@ -51,6 +53,6 @@ public class StreamUtil
 	
 	public static void pipeAll(InputStream is, OutputStream os) throws IOException
 	{
-		pipeAll(is,os,0x4000);
+		pipeAll(is,os,DEFAULT_BUFFER_SIZE_BYTES);
 	}
 }
