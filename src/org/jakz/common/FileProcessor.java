@@ -47,6 +47,7 @@ import java.util.zip.ZipFile;
 /**
  * Class to process files: encryption, compression et.c.
  * To use BouncyCastle encryption methods, you will have to {@code Security.addProvider(new BouncyCastleProvider());}
+ * Uses the old File-class.
  * @author johkal
  *
  */
