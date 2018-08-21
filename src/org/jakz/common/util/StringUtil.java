@@ -255,9 +255,16 @@ public class StringUtil
 		return source+product.toString();
 	}
 	
+	public static String cleanFileName(String toClean, String replacement)
+	{
+		if(toClean==null)
+			return null;
+		return toClean.replaceAll("[^a-zA-Z0-9_\\.\\-]", replacement);
+	}
+	
 	public static String cleanFileNameLossy(String toClean)
 	{
-		return toClean.replaceAll("[^a-zA-Z0-9_\\.\\-]", "");
+		return cleanFileName(toClean, "");
 	}
 	
 	public static String cleanFileNameLossyTimeString(String toCleanTimeString)
