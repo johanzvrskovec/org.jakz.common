@@ -27,6 +27,9 @@ public class Lockdown
 	
 	private HashSet<String> roles;
 	
+	public boolean settingResetRolesOnAuthenticationChange=true;
+	
+	
 	public Lockdown() throws NoSuchAlgorithmException
 	{
 		
@@ -71,6 +74,9 @@ public class Lockdown
 	 */
 	public void authenticate(String usernameString, String authenticationB64String, String userSecret)
 	{
+		if(settingResetRolesOnAuthenticationChange)
+			roles.clear();
+		
 		if(authRandB64String==null)
 			throw new IllegalArgumentException("The internal authRandB64String can not be null for this to work.");
 		curentUsername=usernameString;
@@ -91,7 +97,14 @@ public class Lockdown
 	
 	public void setAuthenticated(boolean nAuthenticated)
 	{
+		if(settingResetRolesOnAuthenticationChange)
+			roles.clear();
 		authenticated=nAuthenticated;
+	}
+	
+	public boolean addRole(Set<String> nRole)
+	{
+		return roles.addAll(nRole);
 	}
 	
 	/**
@@ -106,16 +119,12 @@ public class Lockdown
 	
 	public boolean authorize(Set<String> rolesToAuthorizeFor)
 	{
-		if(isAuthenticated())
-		{
-			roles.containsAll(rolesToAuthorizeFor);
-		}
-		return false;
+		return isAuthenticated() && roles.containsAll(rolesToAuthorizeFor);
 	}
 	
-	public boolean authorize(String role)
+	public boolean authorize(String roleToAuthorizeFor)
 	{
-		return isAuthenticated()&&roles.contains(role);
+		return isAuthenticated() && roles.contains(roleToAuthorizeFor);
 	}
 	
 	public SecureRandom getRandomGenerator() {return randGen;}
